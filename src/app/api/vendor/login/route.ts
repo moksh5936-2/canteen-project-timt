@@ -17,11 +17,11 @@ export async function POST(request: Request) {
     });
 
     // Seed a default admin if none exists for demo purposes
-    if (!vendor && email === "admin@canteen.com" && password === "password") {
+    if (!vendor && email === "canteen@timt.ac.in" && password === "canteen@123") {
       vendor = await prisma.vendor.create({
         data: {
-          email: "admin@canteen.com",
-          password: "password", // DO NOT DO THIS IN PRODUCTION!
+          email: "canteen@timt.ac.in",
+          password: "canteen@123", // Note: In production, hash this password
           name: "Main Canteen",
           phone: "+1234567890",
         }

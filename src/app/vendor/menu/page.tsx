@@ -16,7 +16,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { SortableItem } from "./SortableItem";
+import { SortableItem } from "./sortable-item";
 import { Plus, Loader2 } from "lucide-react";
 
 type MenuItem = {

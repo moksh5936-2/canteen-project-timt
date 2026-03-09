@@ -95,11 +95,12 @@ export async function DELETE(request: Request) {
 
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
+    const item = await prisma.menuItem.findUnique({ where: { id } });
+    if (!item) return NextResponse.json({ error: "Item not found" }, { status: 404 });
+    if (item.vendorId !== vendorId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
     await prisma.menuItem.delete({
-      where: { id_vendorId: { id, vendorId } } as any // Handle multiple unique if needed, here we just check id but Prisma requires valid unique
-    }).catch(() => {
-      // simpler fallback since id is unique
-      return prisma.menuItem.delete({ where: { id } });
+      where: { id }
     });
 
     return NextResponse.json({ success: true });

@@ -18,6 +18,7 @@ export async function GET() {
     },
     include: {
       items: {
+        where: { menuItem: { vendorId } },
         include: { menuItem: true }
       }
     },
@@ -34,6 +35,19 @@ export async function PUT(request: Request) {
 
   try {
     const { orderId, status } = await request.json();
+
+    // Verify the vendor has items in this order
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { items: { include: { menuItem: true } } }
+    });
+
+    if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    const hasVendorItem = order.items.some((item: any) => item.menuItem.vendorId === vendorId);
+    
+    if (!hasVendorItem) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
