@@ -33,7 +33,17 @@ export default function Home() {
     fetch("/api/menu")
       .then(res => res.json())
       .then(data => {
-        setMenu(data);
+        if (Array.isArray(data)) {
+          setMenu(data);
+        } else {
+          console.error("API returned error:", data);
+          setMenu([]); 
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Fetch error:", err);
+        setMenu([]);
         setLoading(false);
       });
   }, []);
