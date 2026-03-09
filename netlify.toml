@@ -4,6 +4,8 @@
 
 [build.environment]
   NEXT_PRIVATE_STANDALONE = "true"
+  DATABASE_URL = "postgresql://neondb_owner:npg_5oLH6izgsReT@ep-autumn-dawn-adsmzk8d-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+  DIRECT_URL = "postgresql://neondb_owner:npg_5oLH6izgsReT@ep-autumn-dawn-adsmzk8d.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
