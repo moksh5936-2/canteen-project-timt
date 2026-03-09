@@ -239,27 +239,14 @@ export default function MenuEditorPage() {
             </div>
 
             <div>
-              <label className="text-muted" style={{ display: "block", marginBottom: "8px", fontSize: "0.9rem" }}>Image (Upload or URL)</label>
+              <label className="text-muted" style={{ display: "block", marginBottom: "8px", fontSize: "0.9rem" }}>Image Upload</label>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 <input 
                   type="file"
                   accept="image/*"
                   onChange={handleImageUpload}
                   className="input-field"
-                  style={{ padding: "8px 12px", background: "var(--color-surface-light)" }}
-                />
-                
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <div style={{ flex: 1, height: "1px", background: "var(--glass-border)" }}></div>
-                  <span className="text-muted" style={{ fontSize: "0.8rem", fontWeight: "bold" }}>OR URL</span>
-                  <div style={{ flex: 1, height: "1px", background: "var(--glass-border)" }}></div>
-                </div>
-
-                <input 
-                  className="input-field" 
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  placeholder="https://..."
+                  style={{ padding: "8px 12px", background: "var(--color-surface-light)", cursor: "pointer" }}
                 />
                 
                 {image && (
