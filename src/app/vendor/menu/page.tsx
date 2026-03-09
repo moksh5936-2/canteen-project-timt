@@ -40,7 +40,11 @@ export default function MenuEditorPage() {
   const [image, setImage] = useState("");
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -123,7 +127,7 @@ export default function MenuEditorPage() {
     <div>
       <h1 className="heading-lg text-gradient" style={{ marginBottom: "24px" }}>Menu Editor</h1>
       
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 350px", gap: "32px", alignItems: "start" }}>
+      <div className="vendor-menu-grid">
         
         {/* Drag and Drop List Area */}
         <div className="glass-panel" style={{ padding: "24px", minHeight: "400px" }}>

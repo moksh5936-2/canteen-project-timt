@@ -43,7 +43,7 @@ export default function VendorLoginPage() {
         <p className="text-muted" style={{ textAlign: 'center', marginBottom: '32px' }}>Login to manage your canteen</p>
 
         {error && (
-          <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.2)', border: '1px solid var(--color-danger)', borderRadius: '8px', color: '#ff8a8a', marginBottom: '24px', textAlign: 'center', fontSize: '0.9rem' }}>
+          <div style={{ padding: '12px', background: 'var(--color-surface)', border: 'var(--hard-border)', boxShadow: '4px 4px 0 var(--color-danger)', borderRadius: '0px', color: 'var(--color-danger)', marginBottom: '24px', textAlign: 'center', fontSize: '0.9rem', fontWeight: 600 }}>
             {error}
           </div>
         )}

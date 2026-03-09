@@ -183,15 +183,15 @@ export default function Home() {
       <div className="container" style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
         <h1 className="heading-xl" style={{ textAlign: "center", marginBottom: "40px" }}>Live Tracker</h1>
         
-        <div className="glass-panel text-center" style={{ padding: "60px", maxWidth: "500px", width: "100%", textAlign: "center", borderTop: `4px solid ${color}`, transition: "all 0.5s ease" }}>
+        <div className="glass-panel text-center" style={{ padding: "60px", maxWidth: "500px", width: "100%", textAlign: "center", borderTop: `8px solid ${color}`, transition: "all 0.5s ease" }}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
             {icon}
           </div>
           <h2 className="heading-lg" style={{ color, marginBottom: "16px" }}>{orderStatus}</h2>
-          <p className="text-muted" style={{ fontSize: "1.2rem" }}>{text}</p>
+          <p className="text-muted" style={{ fontSize: "1.2rem", fontWeight: "bold" }}>{text}</p>
           
-          <div style={{ marginTop: "40px", padding: "16px", background: "rgba(255,255,255,0.05)", borderRadius: "12px" }}>
-            <p className="text-muted" style={{ margin: 0, fontSize: "0.9rem" }}>Order ID: {orderId}</p>
+          <div style={{ marginTop: "40px", padding: "16px", background: "var(--color-surface-light)", border: "var(--hard-border)", borderRadius: "0px" }}>
+            <p className="text-muted" style={{ margin: 0, fontSize: "0.9rem", fontWeight: "bold", textTransform: "uppercase" }}>Order ID: {orderId}</p>
           </div>
         </div>
 
@@ -209,7 +209,7 @@ export default function Home() {
       <div className="container" style={{ padding: "40px 24px" }}>
         <button onClick={() => setView("MENU")} className="btn btn-outline" style={{ marginBottom: "32px" }}>← Back to Menu</button>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
+        <div className="checkout-grid">
           
           <div className="glass-panel" style={{ padding: "32px" }}>
             <h2 className="heading-lg text-gradient" style={{ marginBottom: "24px" }}>Checkout</h2>
@@ -223,8 +223,8 @@ export default function Home() {
                 <input required className="input-field" value={rollNo} onChange={e => setRollNo(e.target.value)} placeholder="e.g. 21CS001" />
               </div>
 
-              <div style={{ background: "rgba(0, 210, 255, 0.1)", border: "1px solid var(--color-secondary)", borderRadius: "12px", padding: "16px", marginTop: "12px" }}>
-                <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--color-text-muted)" }}>
+              <div style={{ background: "var(--color-accent)", border: "var(--hard-border)", borderRadius: "0px", padding: "16px", marginTop: "12px" }}>
+                <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--color-text)", fontWeight: "bold" }}>
                   Payments are simulated internally for this demonstration.
                 </p>
               </div>
@@ -263,85 +263,106 @@ export default function Home() {
   return (
     <div style={{ paddingBottom: "100px" }}>
       {/* Header */}
-      <header className="container" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px", paddingTop: "40px", marginBottom: "24px" }}>
-        
-        <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-          <h1 className="heading-xl text-gradient" style={{ margin: 0 }}>Canteen</h1>
-          
-          <div style={{ display: "flex", gap: "12px" }}>
-            <button 
-              onClick={() => setView("DOCS" as any)} 
-              className="btn btn-outline animate-float"
-              style={{ padding: "8px 16px", borderRadius: "100px", fontSize: "0.85rem", borderColor: "rgba(255, 255, 255, 0.2)" }}
-            >
-              ℹ️ TIMT Info
-            </button>
-            <a 
-              href="/vendor/login"
-              className="btn btn-outline"
-              style={{ padding: "8px 16px", borderRadius: "100px", fontSize: "0.85rem", borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
-            >
-              👨‍🍳 Vendor Login
-            </a>
+      <header className="app-header">
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div style={{ background: "var(--color-primary)", padding: "12px", borderRadius: "0px", border: "var(--hard-border)", boxShadow: "var(--hard-shadow)" }}>
+             <UtensilsCrossed color="white" size={24} />
           </div>
+          <h1 className="heading-ld" style={{ margin: 0, letterSpacing: "-0.05em", fontSize: "1.75rem" }}>Canteen Cartel</h1>
         </div>
 
-        {cartItemCount > 0 && (
-          <button onClick={() => setView("CHECKOUT")} className="glass-panel" style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 24px", cursor: "pointer", border: "1px solid var(--color-primary)", background: "rgba(255, 46, 147, 0.15)", outline: "none" }}>
-            <ShoppingCart color="var(--color-text)" size={24} />
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-              <span style={{ fontWeight: 800, lineHeight: 1 }}>{cartItemCount} items</span>
-              <span style={{ fontSize: "0.85rem", color: "var(--color-secondary)" }}>₹{totalAmount.toFixed(2)}</span>
-            </div>
-            <ArrowRight size={20} style={{ marginLeft: "8px" }} />
+        <div className="header-actions" style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+          <button onClick={() => setView("DOCS" as any)} className="btn btn-outline" style={{ display: "flex", gap: "8px", fontWeight: "800" }}>
+            <PartyPopper size={18} /> TIMT INFO
           </button>
-        )}
+          
+          <a href="/vendor/login" className="btn btn-secondary" style={{ display: "flex", gap: "8px", fontWeight: "800" }}>
+            DASHBOARD <ArrowRight size={18} />
+          </a>
+        </div>
       </header>
 
-      <main className="container">
+      {/* Hero Section */}
+      <section className="hero-section">
+        <div className="container" style={{ maxWidth: "1200px", margin: "0 auto" }}>
+          <h1 className="heading-xl hero-responsive-text" style={{ margin: 0, textTransform: "uppercase", letterSpacing: "-0.02em", lineHeight: "0.95" }}>
+            <span style={{ display: "block", color: "white" }}>SKIP THE</span>
+            <span style={{ display: "block", color: "var(--color-accent)" }}>LINE.</span>
+            <span style={{ display: "block", color: "white" }}>GRAB A</span>
+            <span style={{ display: "block", color: "var(--color-primary)" }}>BITE.</span>
+          </h1>
+          <p style={{ marginTop: "24px", fontSize: "1.25rem", color: "rgba(255,255,255,0.9)", maxWidth: "500px", lineHeight: 1.6 }}>
+            Order from your favorite campus menu instantly.<br/>
+            Fresh, hot, and ready when you are.
+          </p>
+        </div>
+      </section>
+
+        {cartItemCount > 0 && (
+          <div className="mobile-cart-btn" style={{ position: "fixed", bottom: "32px", right: "32px", zIndex: 50 }}>
+            <button onClick={() => setView("CHECKOUT")} className="glass-panel" style={{ display: "flex", alignItems: "center", gap: "12px", padding: "16px 24px", cursor: "pointer", background: "var(--color-surface)", border: "var(--hard-border)", boxShadow: "var(--hard-shadow)", outline: "none" }}>
+              <ShoppingCart color="var(--color-text)" size={24} />
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                <span style={{ fontWeight: 800, lineHeight: 1, fontSize: "1.1rem" }}>{cartItemCount} items of the menu</span>
+                <span style={{ fontSize: "0.95rem", color: "var(--color-primary)", fontWeight: "700" }}>₹{totalAmount.toFixed(2)}</span>
+              </div>
+              <ArrowRight size={20} style={{ marginLeft: "8px" }} />
+            </button>
+          </div>
+        )}
+
+      <main className="container" style={{ paddingTop: "60px", maxWidth: "1200px", margin: "0 auto" }}>
+        
+        <div style={{ display: "flex", alignItems: "center", gap: "24px", marginBottom: "40px" }}>
+          <h2 className="heading-lg" style={{ margin: 0 }}>Campus Menu</h2>
+          <div style={{ flex: 1, height: "2px", background: "var(--color-text-muted)", opacity: 0.3 }}></div>
+        </div>
+
         {menu.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px" }}>
             <p className="heading-md text-muted">The canteen is currently updating the menu. Come back soon!</p>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "32px" }}>
+          <div className="menu-grid">
             {menu.map(item => {
               const inCart = cart.find(i => i.id === item.id);
               return (
-                <div key={item.id} className="glass-panel" style={{ display: "flex", flexDirection: "column", padding: "24px", height: "100%", position: "relative", overflow: "hidden" }}>
-                  {inCart && (
-                    <div style={{ position: "absolute", top: 0, right: 0, background: "var(--color-primary)", color: "white", padding: "8px 16px", borderBottomLeftRadius: "16px", fontWeight: 800 }}>
-                      {inCart.quantity} in cart
+                <div key={item.id} className="glass-panel" style={{ display: "flex", flexDirection: "column", height: "100%", position: "relative", overflow: "hidden", background: "var(--color-surface-light)", padding: "0" }}>
+                  
+                  {/* Card Yellow Hero Content  */}
+                  <div style={{ background: "var(--color-accent)", height: "200px", padding: "20px", position: "relative", borderBottom: "var(--hard-border)" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "var(--color-surface)", padding: "6px 16px", borderRadius: "0px", border: "var(--hard-border)", boxShadow: "4px 4px 0 #000", fontWeight: "800", fontSize: "0.85rem", textTransform: "uppercase" }}>
+                      <span style={{ width: "10px", height: "10px", borderRadius: "0px", background: "var(--color-success)", border: "2px solid #000" }}></span> OPEN
                     </div>
-                  )}
-                  
-                  <div style={{ flexGrow: 1, marginBottom: "24px", marginTop: "12px" }}>
-                    <h3 className="heading-md" style={{ marginBottom: "8px" }}>{item.name}</h3>
-                    <span className="text-muted" style={{ display: "inline-block", padding: "4px 12px", background: "var(--color-surface-light)", borderRadius: "100px", fontSize: "0.8rem", marginBottom: "12px" }}>
-                      {item.vendor.name}
-                    </span>
-                    {item.description && <p className="text-muted" style={{ fontSize: "0.95rem" }}>{item.description}</p>}
                   </div>
-                  
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span className="heading-lg" style={{ color: "var(--color-secondary)" }}>₹{item.price}</span>
+
+                  <div style={{ padding: "24px", flexGrow: 1, display: "flex", flexDirection: "column" }}>
+                    <div style={{ flexGrow: 1, marginBottom: "24px" }}>
+                      <h3 className="heading-md" style={{ marginBottom: "12px", fontSize: "2rem" }}>{item.name}</h3>
+                      <p className="text-muted" style={{ fontSize: "1.05rem", minHeight: "48px" }}>
+                        {item.description || "The best food on campus."}
+                      </p>
+                    </div>
                     
-                    {inCart ? (
-                      <div style={{ display: "flex", alignItems: "center", gap: "12px", background: "var(--color-surface-light)", padding: "4px", borderRadius: "12px" }}>
-                        <button onClick={() => removeFromCart(item.id)} style={{ padding: "8px", background: "var(--color-bg)", border: "none", borderRadius: "8px", cursor: "pointer", color: "white" }}>
-                          <Minus size={16} />
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", flexWrap: "wrap", gap: "12px" }}>
+                      <span style={{ color: "var(--color-secondary)", fontWeight: "800", display: "flex", alignItems: "center", gap: "6px", fontSize: "1.1rem" }}>
+                         ◎ {item.vendor.name.toUpperCase()}
+                      </span>
+                      
+                      {inCart ? (
+                        <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px", border: "var(--hard-border)", boxShadow: "4px 4px 0 #000" }}>
+                          <button onClick={() => removeFromCart(item.id)} style={{ padding: "10px 16px", background: "transparent", border: "none", borderRight: "var(--hard-border)", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>-</button>
+                          <span style={{ fontWeight: 800, padding: "0 16px", fontSize: "1.1rem" }}>{inCart.quantity}</span>
+                          <button onClick={() => addToCart(item)} style={{ padding: "10px 16px", background: "transparent", border: "none", borderLeft: "var(--hard-border)", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>+</button>
+                        </div>
+                      ) : (
+                        <button onClick={() => addToCart(item)} style={{ background: "var(--color-primary)", color: "white", border: "var(--hard-border)", boxShadow: "4px 4px 0 #000", padding: "12px 24px", borderRadius: "0px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", textTransform: "uppercase", transition: "all 0.1s" }} onMouseOver={e => { e.currentTarget.style.transform = "translate(-2px,-2px)"; e.currentTarget.style.boxShadow = "6px 6px 0 #000"; }} onMouseOut={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "4px 4px 0 #000"; }}>
+                          ADD +
                         </button>
-                        <span style={{ fontWeight: 700, width: "20px", textAlign: "center" }}>{inCart.quantity}</span>
-                        <button onClick={() => addToCart(item)} style={{ padding: "8px", background: "var(--color-primary)", border: "none", borderRadius: "8px", cursor: "pointer", color: "white" }}>
-                          <Plus size={16} />
-                        </button>
-                      </div>
-                    ) : (
-                      <button onClick={() => addToCart(item)} className="btn btn-outline" style={{ padding: "12px 16px", borderColor: "var(--color-primary)", color: "var(--color-primary)" }}>
-                        Add to Cart <Plus size={16} style={{ marginLeft: "4px" }} />
-                      </button>
-                    )}
+                      )}
+                    </div>
                   </div>
+                  
                 </div>
               );
             })}

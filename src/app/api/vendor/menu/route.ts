@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
@@ -85,13 +85,12 @@ export async function PUT(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   const vendorId = await getVendorId();
   if (!vendorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const url = new URL(request.url);
-    const id = url.searchParams.get('id');
+    const id = request.nextUrl.searchParams.get('id');
 
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
@@ -99,12 +98,17 @@ export async function DELETE(request: Request) {
     if (!item) return NextResponse.json({ error: "Item not found" }, { status: 404 });
     if (item.vendorId !== vendorId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    await prisma.menuItem.delete({
-      where: { id }
-    });
+    await prisma.$transaction([
+      prisma.orderItem.deleteMany({
+        where: { menuItemId: id }
+      }),
+      prisma.menuItem.delete({
+        where: { id }
+      })
+    ]);
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: "Deletion failed" }, { status: 500 });
+    return NextResponse.json({ error: "Deletion failed", details: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

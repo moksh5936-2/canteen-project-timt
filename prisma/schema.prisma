@@ -51,7 +51,7 @@ model OrderItem {
   quantity   Int
   price      Float
   menuItemId String
-  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
   orderId    String
   order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }

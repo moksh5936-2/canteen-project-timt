@@ -23,12 +23,12 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
   ];
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--color-bg)" }}>
+    <div className="vendor-layout" style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--color-bg)" }}>
       {/* Sidebar */}
-      <aside className="glass-panel" style={{ width: "260px", padding: "24px", display: "flex", flexDirection: "column", borderTopLeftRadius: 0, borderBottomLeftRadius: 0, borderRight: "var(--glass-border)", zIndex: 10 }}>
+      <aside className="vendor-sidebar glass-panel" style={{ width: "260px", padding: "24px", display: "flex", flexDirection: "column", borderTopLeftRadius: "0px", borderBottomLeftRadius: "0px", borderRight: "var(--hard-border)", zIndex: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "40px" }}>
           <Utensils color="var(--color-primary)" size={28} />
-          <h2 className="heading-md" style={{ margin: 0 }}>Canteen</h2>
+          <h2 className="heading-md" style={{ margin: 0 }}>Canteen Cartel</h2>
         </div>
 
         <nav style={{ display: "flex", flexDirection: "column", gap: "12px", flexGrow: 1 }}>
@@ -44,10 +44,12 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
                   alignItems: "center",
                   gap: "12px",
                   padding: "12px 16px",
-                  borderRadius: "12px",
+                  borderRadius: "0px",
                   textDecoration: "none",
-                  color: isActive ? "var(--color-primary)" : "var(--color-text-muted)",
-                  background: isActive ? "rgba(255, 46, 147, 0.1)" : "transparent",
+                  color: isActive ? "var(--color-text)" : "var(--color-text-muted)",
+                  background: isActive ? "var(--color-accent)" : "transparent",
+                  border: isActive ? "var(--hard-border)" : "3px solid transparent",
+                  boxShadow: isActive ? "4px 4px 0 #000" : "none",
                   transition: "all var(--transition-fast)",
                   fontWeight: isActive ? 600 : 400
                 }}

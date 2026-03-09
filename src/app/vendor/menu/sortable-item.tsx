@@ -44,9 +44,9 @@ export function SortableItem({ item, onToggle, onDelete }: SortableItemProps) {
         alignItems: "center", 
         padding: "16px",
         gap: "16px",
-        background: item.isAvailable ? "rgba(255, 255, 255, 0.02)" : "rgba(0, 0, 0, 0.3)",
-        border: isDragging ? "1px solid var(--color-primary)" : "none",
-        borderRadius: "18px"
+        background: item.isAvailable ? "transparent" : "var(--color-surface-light)",
+        borderBottom: isDragging ? "var(--hard-border)" : "2px solid #000",
+        borderRadius: "0px"
       }}>
         <div 
           {...attributes} 
