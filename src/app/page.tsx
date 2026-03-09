@@ -344,7 +344,7 @@ export default function Home() {
                 <div key={item.id} className="glass-panel" style={{ display: "flex", flexDirection: "column", height: "100%", position: "relative", overflow: "hidden", background: "var(--color-surface-light)", padding: "0" }}>
                   
                   {/* Card Yellow Hero Content  */}
-                  <div style={{ background: "var(--color-accent)", height: "200px", padding: "20px", position: "relative", borderBottom: "var(--hard-border)" }}>
+                  <div style={{ background: item.image ? `url(${item.image}) center/cover` : "var(--color-accent)", height: "200px", padding: "20px", position: "relative", borderBottom: "var(--hard-border)" }}>
                     <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "var(--color-surface)", padding: "6px 16px", borderRadius: "0px", border: "var(--hard-border)", boxShadow: "4px 4px 0 #000", fontWeight: "800", fontSize: "0.85rem", textTransform: "uppercase" }}>
                       <span style={{ width: "10px", height: "10px", borderRadius: "0px", background: "var(--color-success)", border: "2px solid #000" }}></span> OPEN
                     </div>

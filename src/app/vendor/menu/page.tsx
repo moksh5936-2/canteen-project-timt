@@ -108,6 +108,24 @@ export default function MenuEditorPage() {
     }
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Check size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image size must be less than 2MB to keep the app fast!");
+      e.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setImage(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const toggleAvailability = async (id: string, currentStatus: boolean) => {
     // Optimistic UI update
     setItems(items.map(item => item.id === id ? { ...item, isAvailable: !currentStatus } : item));
@@ -221,13 +239,43 @@ export default function MenuEditorPage() {
             </div>
 
             <div>
-              <label className="text-muted" style={{ display: "block", marginBottom: "8px", fontSize: "0.9rem" }}>Image URL</label>
-              <input 
-                className="input-field" 
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                placeholder="https://..."
-              />
+              <label className="text-muted" style={{ display: "block", marginBottom: "8px", fontSize: "0.9rem" }}>Image (Upload or URL)</label>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <input 
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="input-field"
+                  style={{ padding: "8px 12px", background: "var(--color-surface-light)" }}
+                />
+                
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ flex: 1, height: "1px", background: "var(--glass-border)" }}></div>
+                  <span className="text-muted" style={{ fontSize: "0.8rem", fontWeight: "bold" }}>OR URL</span>
+                  <div style={{ flex: 1, height: "1px", background: "var(--glass-border)" }}></div>
+                </div>
+
+                <input 
+                  className="input-field" 
+                  value={image}
+                  onChange={(e) => setImage(e.target.value)}
+                  placeholder="https://..."
+                />
+                
+                {image && (
+                  <div style={{ marginTop: "8px", border: "var(--hard-border)", borderRadius: "0px", overflow: "hidden", position: "relative", height: "120px" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={image} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <button 
+                      type="button" 
+                      onClick={() => setImage("")} 
+                      style={{ position: "absolute", top: "4px", right: "4px", background: "var(--color-primary)", color: "white", border: "2px solid #000", cursor: "pointer", width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}
+                    >
+                      X
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             <button type="submit" className="btn btn-primary" style={{ marginTop: "8px" }}>
