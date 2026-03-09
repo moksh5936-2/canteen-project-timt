@@ -44,6 +44,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, vendorId: vendor.id });
   } catch (error) {
     console.error("Login error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error", details: String(error) }, { status: 500 });
   }
 }

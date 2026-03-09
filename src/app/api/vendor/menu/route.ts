@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(newItem);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to create item" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error", details: String(error) }, { status: 500 });
   }
 }
 
