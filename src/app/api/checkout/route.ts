@@ -19,8 +19,16 @@ export async function POST(request: Request) {
       if (!dbItem || !dbItem.isAvailable) {
         return NextResponse.json({ error: `Item ${item.name || item.id} is unavailable` }, { status: 400 });
       }
-      calculatedTotal += dbItem.price * item.quantity;
-      itemsData.push({ ...item, price: dbItem.price }); // Use DB price securely
+
+      let itemPrice = dbItem.price;
+      if (item.variant === "Half" && dbItem.halfPrice) {
+        itemPrice = dbItem.halfPrice;
+      } else if (item.variant === "Full" && dbItem.fullPrice) {
+        itemPrice = dbItem.fullPrice;
+      }
+
+      calculatedTotal += itemPrice * item.quantity;
+      itemsData.push({ ...item, price: itemPrice, variant: item.variant }); // Use DB price securely
     }
 
     // Create the order
@@ -36,6 +44,7 @@ export async function POST(request: Request) {
           create: itemsData.map((item: any) => ({
             quantity: item.quantity,
             price: item.price,
+            variant: item.variant || null,
             menuItem: { connect: { id: item.id } }
           }))
         }

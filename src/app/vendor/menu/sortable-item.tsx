@@ -9,6 +9,8 @@ type SortableItemProps = {
     id: string;
     name: string;
     price: number;
+    halfPrice: number | null;
+    fullPrice: number | null;
     description: string | null;
     isAvailable: boolean;
     category: string;
@@ -66,8 +68,16 @@ export function SortableItem({ item, onToggle, onDelete }: SortableItemProps) {
               </span>
             </h3>
             <span style={{ display: "flex", alignItems: "center", color: "var(--color-secondary)", fontWeight: 700 }}>
-              <IndianRupee size={14} style={{ marginRight: "2px" }} />
-              {item.price.toFixed(2)}
+              {item.halfPrice && item.fullPrice ? (
+                <span style={{ fontSize: "0.95rem" }}>
+                  Half: <IndianRupee size={12} style={{ margin: "0 1px 0 2px" }} />{item.halfPrice.toFixed(2)} | Full: <IndianRupee size={12} style={{ margin: "0 1px 0 2px" }} />{item.fullPrice.toFixed(2)}
+                </span>
+              ) : (
+                <>
+                  <IndianRupee size={14} style={{ marginRight: "2px" }} />
+                  {item.price.toFixed(2)}
+                </>
+              )}
             </span>
           </div>
           {item.description && (

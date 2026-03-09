@@ -7,9 +7,15 @@ export async function GET() {
   const vendorId = cookieStore.get('vendor_session')?.value;
   if (!vendorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
   // Fetch orders that contain items belonging to this vendor
   const orders = await prisma.order.findMany({
     where: {
+      createdAt: {
+        gte: startOfDay,
+      },
       items: {
         some: {
           menuItem: { vendorId }

@@ -9,29 +9,31 @@ datasource db {
 }
 
 model Vendor {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String     @id @default(cuid())
+  email     String     @unique
   password  String
   name      String
   phone     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   menuItems MenuItem[]
 }
 
 model MenuItem {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   name        String
   description String?
   price       Float
+  halfPrice   Float? // Optional field for Half Plate pricing
+  fullPrice   Float? // Optional field for Full Plate pricing
   image       String?
-  category    String   @default("Main")
-  isAvailable Boolean  @default(true)
-  orderIndex  Int      @default(0)
+  category    String      @default("Main")
+  isAvailable Boolean     @default(true)
+  orderIndex  Int         @default(0)
   vendorId    String
-  vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  vendor      Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   orderItems  OrderItem[]
 }
 
@@ -52,6 +54,7 @@ model OrderItem {
   id         String   @id @default(cuid())
   quantity   Int
   price      Float
+  variant    String? // To store 'Half' or 'Full', null means Standard
   menuItemId String
   menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
   orderId    String

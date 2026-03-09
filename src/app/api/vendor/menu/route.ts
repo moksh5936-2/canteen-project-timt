@@ -38,6 +38,8 @@ export async function POST(request: Request) {
         name: data.name,
         description: data.description,
         price: parseFloat(data.price),
+        halfPrice: data.halfPrice ? parseFloat(data.halfPrice) : null,
+        fullPrice: data.fullPrice ? parseFloat(data.fullPrice) : null,
         image: data.image || null,
         category: data.category || "Main",
         vendorId,

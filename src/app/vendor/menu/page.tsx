@@ -28,6 +28,8 @@ type MenuItem = {
   isAvailable: boolean;
   category: string;
   orderIndex: number;
+  halfPrice: number | null;
+  fullPrice: number | null;
 };
 
 export default function MenuEditorPage() {
@@ -38,6 +40,9 @@ export default function MenuEditorPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [hasHalfFull, setHasHalfFull] = useState(false);
+  const [halfPrice, setHalfPrice] = useState("");
+  const [fullPrice, setFullPrice] = useState("");
   const [image, setImage] = useState("");
   const [category, setCategory] = useState("Main");
 
@@ -90,18 +95,35 @@ export default function MenuEditorPage() {
 
   const addItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !price) return;
+    
+    if (hasHalfFull) {
+      if (!name || !halfPrice || !fullPrice) return;
+    } else {
+      if (!name || !price) return;
+    }
+
+    const payload: any = { name, description, image, category };
+    if (hasHalfFull) {
+        payload.price = 0; // Default or base, not strictly used
+        payload.halfPrice = halfPrice;
+        payload.fullPrice = fullPrice;
+    } else {
+        payload.price = price;
+    }
 
     const res = await fetch("/api/vendor/menu", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, description, price, image, category }),
+      body: JSON.stringify(payload),
     });
 
     if (res.ok) {
       setName("");
       setDescription("");
       setPrice("");
+      setHalfPrice("");
+      setFullPrice("");
+      setHasHalfFull(false);
       setImage("");
       setCategory("Main");
       fetchItems();
@@ -201,18 +223,60 @@ export default function MenuEditorPage() {
               />
             </div>
 
-            <div>
-              <label className="text-muted" style={{ display: "block", marginBottom: "8px", fontSize: "0.9rem" }}>Price (₹)*</label>
-              <input 
-                className="input-field" 
-                type="number"
-                step="0.01"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                required
-                placeholder="e.g. 150"
-              />
-            </div>
+            {category === "Main" && (
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px", background: "var(--color-surface-light)", border: "1px solid var(--color-surface)" }}>
+                <input 
+                  type="checkbox"
+                  id="hasHalfFull"
+                  checked={hasHalfFull}
+                  onChange={(e) => setHasHalfFull(e.target.checked)}
+                  style={{ width: "18px", height: "18px", accentColor: "var(--color-primary)" }}
+                />
+                <label htmlFor="hasHalfFull" style={{ fontWeight: "600", cursor: "pointer", userSelect: "none" }}>Has Half/Full Plate Options?</label>
+              </div>
+            )}
+
+            {!hasHalfFull ? (
+              <div>
+                <label className="text-muted" style={{ display: "block", marginBottom: "8px", fontSize: "0.9rem" }}>Price (₹)*</label>
+                <input 
+                  className="input-field" 
+                  type="number"
+                  step="0.01"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  required
+                  placeholder="e.g. 150"
+                />
+              </div>
+            ) : (
+              <div style={{ display: "flex", gap: "16px" }}>
+                <div style={{ flex: 1 }}>
+                  <label className="text-muted" style={{ display: "block", marginBottom: "8px", fontSize: "0.9rem" }}>Half Plate (₹)*</label>
+                  <input 
+                    className="input-field" 
+                    type="number"
+                    step="0.01"
+                    value={halfPrice}
+                    onChange={(e) => setHalfPrice(e.target.value)}
+                    required
+                    placeholder="100"
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="text-muted" style={{ display: "block", marginBottom: "8px", fontSize: "0.9rem" }}>Full Plate (₹)*</label>
+                  <input 
+                    className="input-field" 
+                    type="number"
+                    step="0.01"
+                    value={fullPrice}
+                    onChange={(e) => setFullPrice(e.target.value)}
+                    required
+                    placeholder="180"
+                  />
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="text-muted" style={{ display: "block", marginBottom: "8px", fontSize: "0.9rem" }}>Description</label>

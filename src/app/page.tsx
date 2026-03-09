@@ -11,10 +11,12 @@ type MenuItem = {
   image: string | null;
   category: string;
   isAvailable: boolean;
+  halfPrice: number | null;
+  fullPrice: number | null;
   vendor: { name: string };
 };
 
-type CartItem = MenuItem & { quantity: number };
+type CartItem = MenuItem & { quantity: number, variant?: "Half" | "Full" };
 
 export default function Home() {
   const [view, setView] = useState<"MENU" | "CHECKOUT" | "TRACKING">("MENU");
@@ -68,9 +70,9 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [view, orderId, orderStatus]);
 
-  const addToCartAndTriggerUpsell = (item: MenuItem) => {
+  const addToCartAndTriggerUpsell = (item: MenuItem, variant?: "Half" | "Full") => {
     // Basic Add to Cart
-    addToCart(item);
+    addToCart(item, variant);
 
     // Trigger explicit animation
     setAnimatingItemId(item.id);
@@ -91,27 +93,33 @@ export default function Home() {
     }
   };
 
-  const addToCart = (item: MenuItem) => {
+  const addToCart = (item: MenuItem, variant?: "Half" | "Full") => {
     setCart(prev => {
-      const existing = prev.find(i => i.id === item.id);
+      const existing = prev.find(i => i.id === item.id && i.variant === variant);
       if (existing) {
-        return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+        return prev.map(i => (i.id === item.id && i.variant === variant) ? { ...i, quantity: i.quantity + 1 } : i);
       }
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { ...item, quantity: 1, variant }];
     });
   };
 
-  const removeFromCart = (id: string) => {
+  const removeFromCart = (id: string, variant?: "Half" | "Full") => {
     setCart(prev => {
-      const existing = prev.find(i => i.id === id);
+      const existing = prev.find(i => i.id === id && i.variant === variant);
       if (existing && existing.quantity > 1) {
-        return prev.map(i => i.id === id ? { ...i, quantity: i.quantity - 1 } : i);
+        return prev.map(i => (i.id === id && i.variant === variant) ? { ...i, quantity: i.quantity - 1 } : i);
       }
-      return prev.filter(i => i.id !== id);
+      return prev.filter(i => !(i.id === id && i.variant === variant));
     });
   };
 
-  const totalAmount = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const getItemPrice = (item: CartItem) => {
+    if (item.variant === "Half" && item.halfPrice) return item.halfPrice;
+    if (item.variant === "Full" && item.fullPrice) return item.fullPrice;
+    return item.price;
+  }
+
+  const totalAmount = cart.reduce((acc, item) => acc + (getItemPrice(item) * item.quantity), 0);
   const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const handleCheckout = async (e: React.FormEvent) => {
@@ -122,7 +130,7 @@ export default function Home() {
     const payload = {
       studentName: name,
       rollNo,
-      items: cart.map(i => ({ id: i.id, quantity: i.quantity, price: i.price })),
+      items: cart.map(i => ({ id: i.id, quantity: i.quantity, price: getItemPrice(i), variant: i.variant })),
       totalAmount
     };
 
@@ -271,12 +279,12 @@ export default function Home() {
           <div className="glass-panel" style={{ padding: "32px" }}>
             <h3 className="heading-md" style={{ marginBottom: "24px" }}>Order Summary</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              {cart.map(item => (
-                <div key={item.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              {cart.map((item, idx) => (
+                <div key={`${item.id}-${item.variant || 'std'}-${idx}`} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div>
-                    <span style={{ fontWeight: 600 }}>{item.quantity}x {item.name}</span>
+                    <span style={{ fontWeight: 600 }}>{item.quantity}x {item.name} {item.variant ? `(${item.variant})` : ''}</span>
                   </div>
-                  <span style={{ fontWeight: 700, color: "var(--color-secondary)" }}>₹{(item.price * item.quantity).toFixed(2)}</span>
+                  <span style={{ fontWeight: 700, color: "var(--color-secondary)" }}>₹{(getItemPrice(item) * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
@@ -392,6 +400,33 @@ export default function Home() {
                         <button disabled style={{ background: "var(--color-text-muted)", color: "white", border: "var(--hard-border)", padding: "12px 24px", borderRadius: "0px", fontWeight: "800", textTransform: "uppercase", cursor: "not-allowed" }}>
                           UNAVAILABLE
                         </button>
+                      ) : (item.halfPrice && item.fullPrice) ? (
+                        <div style={{ display: "flex", gap: "8px", flexDirection: "column", alignItems: "flex-end" }}>
+                          {/* Half Plate Controls */}
+                          {cart.find(i => i.id === item.id && i.variant === "Half") ? (
+                            <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px", border: "var(--hard-border)", boxShadow: "2px 2px 0 #000" }}>
+                              <button onClick={() => removeFromCart(item.id, "Half")} style={{ padding: "6px 12px", background: "transparent", border: "none", borderRight: "var(--hard-border)", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.1rem" }}>-</button>
+                              <span style={{ fontWeight: 800, padding: "0 12px", fontSize: "0.95rem" }}>{cart.find(i => i.id === item.id && i.variant === "Half")?.quantity} Half</span>
+                              <button onClick={() => addToCartAndTriggerUpsell(item, "Half")} style={{ padding: "6px 12px", background: "transparent", border: "none", borderLeft: "var(--hard-border)", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.1rem" }}>+</button>
+                            </div>
+                          ) : (
+                            <button onClick={() => addToCartAndTriggerUpsell(item, "Half")} style={{ background: "var(--color-surface)", color: "var(--color-text)", border: "var(--hard-border)", boxShadow: "2px 2px 0 #000", padding: "8px 16px", borderRadius: "0px", cursor: "pointer", fontWeight: "800", fontSize: "0.85rem" }}>
+                              HALF - ₹{item.halfPrice} +
+                            </button>
+                          )}
+                          {/* Full Plate Controls */}
+                          {cart.find(i => i.id === item.id && i.variant === "Full") ? (
+                            <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-accent)", color: "var(--color-text)", borderRadius: "0px", border: "var(--hard-border)", boxShadow: "2px 2px 0 #000" }}>
+                              <button onClick={() => removeFromCart(item.id, "Full")} style={{ padding: "6px 12px", background: "transparent", border: "none", borderRight: "var(--hard-border)", color: "inherit", cursor: "pointer", fontWeight: "800", fontSize: "1.1rem" }}>-</button>
+                              <span style={{ fontWeight: 800, padding: "0 12px", fontSize: "0.95rem" }}>{cart.find(i => i.id === item.id && i.variant === "Full")?.quantity} Full</span>
+                              <button onClick={() => addToCartAndTriggerUpsell(item, "Full")} style={{ padding: "6px 12px", background: "transparent", border: "none", borderLeft: "var(--hard-border)", color: "inherit", cursor: "pointer", fontWeight: "800", fontSize: "1.1rem" }}>+</button>
+                            </div>
+                          ) : (
+                            <button onClick={() => addToCartAndTriggerUpsell(item, "Full")} style={{ background: "var(--color-surface)", color: "var(--color-text)", border: "var(--hard-border)", boxShadow: "2px 2px 0 #000", padding: "8px 16px", borderRadius: "0px", cursor: "pointer", fontWeight: "800", fontSize: "0.85rem" }}>
+                              FULL - ₹{item.fullPrice} +
+                            </button>
+                          )}
+                        </div>
                       ) : inCart ? (
                         <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px", border: "var(--hard-border)", boxShadow: "4px 4px 0 #000" }}>
                           <button onClick={() => removeFromCart(item.id)} style={{ padding: "10px 16px", background: "transparent", border: "none", borderRight: "var(--hard-border)", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>-</button>
