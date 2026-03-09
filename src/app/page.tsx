@@ -27,8 +27,9 @@ export default function Home() {
   const [rollNo, setRollNo] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Addon selection flow
-  const [showAddonsFor, setShowAddonsFor] = useState<MenuItem | null>(null);
+  // Upsell Side-Drawer flow
+  const [upsellItem, setUpsellItem] = useState<MenuItem | null>(null);
+  const [animatingItemId, setAnimatingItemId] = useState<string | null>(null);
 
   // Tracking
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -67,12 +68,25 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [view, orderId, orderStatus]);
 
-  const addToCartAndCheckAddons = (item: MenuItem) => {
+  const addToCartAndTriggerUpsell = (item: MenuItem) => {
+    // Basic Add to Cart
     addToCart(item);
+
+    // Trigger explicit animation
+    setAnimatingItemId(item.id);
+    setTimeout(() => setAnimatingItemId(null), 300);
+
+    // Only open the drawer if we are adding a Main item
+    // and there are either Addons OR other available Main items from this vendor
     if (item.category === "Main") {
-       const hasAddons = menu.some(m => m.category === "Addon" && m.vendor.name === item.vendor.name);
-       if (hasAddons) {
-         setShowAddonsFor(item);
+       const hasUpsells = menu.some(m => 
+          m.vendor.name === item.vendor.name && 
+          m.isAvailable && 
+          (m.category === "Addon" || (m.category === "Main" && m.id !== item.id))
+       );
+       
+       if (hasUpsells) {
+         setUpsellItem(item);
        }
     }
   };
@@ -346,7 +360,7 @@ export default function Home() {
             {menu.filter(m => m.category === "Main").map(item => {
               const inCart = cart.find(i => i.id === item.id);
               return (
-                <div key={item.id} className="glass-panel" style={{ display: "flex", flexDirection: "column", height: "100%", position: "relative", overflow: "hidden", background: "var(--color-surface-light)", padding: "0" }}>
+                <div key={item.id} className={`glass-panel ${animatingItemId === item.id ? 'animate-pop' : ''}`} style={{ display: "flex", flexDirection: "column", height: "100%", position: "relative", overflow: "hidden", background: "var(--color-surface-light)", padding: "0" }}>
                   
                   {/* Card Yellow Hero Content  */}
                   <div style={{ background: item.image ? `url(${item.image}) center/cover` : "var(--color-accent)", height: "200px", padding: "20px", position: "relative", borderBottom: "var(--hard-border)", filter: item.isAvailable ? "none" : "grayscale(80%)", opacity: item.isAvailable ? 1 : 0.6 }}>
@@ -382,10 +396,10 @@ export default function Home() {
                         <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px", border: "var(--hard-border)", boxShadow: "4px 4px 0 #000" }}>
                           <button onClick={() => removeFromCart(item.id)} style={{ padding: "10px 16px", background: "transparent", border: "none", borderRight: "var(--hard-border)", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>-</button>
                           <span style={{ fontWeight: 800, padding: "0 16px", fontSize: "1.1rem" }}>{inCart.quantity}</span>
-                          <button onClick={() => addToCartAndCheckAddons(item)} style={{ padding: "10px 16px", background: "transparent", border: "none", borderLeft: "var(--hard-border)", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>+</button>
+                          <button onClick={() => addToCartAndTriggerUpsell(item)} style={{ padding: "10px 16px", background: "transparent", border: "none", borderLeft: "var(--hard-border)", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>+</button>
                         </div>
                       ) : (
-                        <button onClick={() => addToCartAndCheckAddons(item)} style={{ background: "var(--color-primary)", color: "white", border: "var(--hard-border)", boxShadow: "4px 4px 0 #000", padding: "12px 24px", borderRadius: "0px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", textTransform: "uppercase", transition: "all 0.1s" }} onMouseOver={e => { e.currentTarget.style.transform = "translate(-2px,-2px)"; e.currentTarget.style.boxShadow = "6px 6px 0 #000"; }} onMouseOut={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "4px 4px 0 #000"; }}>
+                        <button onClick={() => addToCartAndTriggerUpsell(item)} style={{ background: "var(--color-primary)", color: "white", border: "var(--hard-border)", boxShadow: "4px 4px 0 #000", padding: "12px 24px", borderRadius: "0px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", textTransform: "uppercase", transition: "all 0.1s" }} onMouseOver={e => { e.currentTarget.style.transform = "translate(-2px,-2px)"; e.currentTarget.style.boxShadow = "6px 6px 0 #000"; }} onMouseOut={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "4px 4px 0 #000"; }}>
                           ADD +
                         </button>
                       )}
@@ -409,7 +423,7 @@ export default function Home() {
               {menu.filter(m => m.category === "Addon").map(item => {
                 const inCart = cart.find(i => i.id === item.id);
                 return (
-                  <div key={item.id} className="glass-panel" style={{ padding: "20px", background: "var(--color-surface)", display: "flex", justifyContent: "space-between", alignItems: "center", opacity: item.isAvailable ? 1 : 0.5 }}>
+                  <div key={item.id} className={`glass-panel ${animatingItemId === item.id ? 'animate-pop' : ''}`} style={{ padding: "20px", background: "var(--color-surface)", display: "flex", justifyContent: "space-between", alignItems: "center", opacity: item.isAvailable ? 1 : 0.5 }}>
                     <div>
                       <h4 style={{ fontSize: "1.1rem", fontWeight: 800, margin: 0, textDecoration: item.isAvailable ? "none" : "line-through" }}>{item.name}</h4>
                       <span style={{ color: "var(--color-text-muted)", fontSize: "0.9rem" }}>{item.vendor.name} • ₹{item.price} {!item.isAvailable && "(Out of Stock)"}</span>
@@ -423,10 +437,10 @@ export default function Home() {
                         <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px", border: "2px solid #000" }}>
                           <button onClick={() => removeFromCart(item.id)} style={{ padding: "6px 12px", background: "transparent", border: "none", borderRight: "2px solid #000", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>-</button>
                           <span style={{ fontWeight: 800, padding: "0 12px", fontSize: "1rem" }}>{inCart.quantity}</span>
-                          <button onClick={() => addToCartAndCheckAddons(item)} style={{ padding: "6px 12px", background: "transparent", border: "none", borderLeft: "2px solid #000", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>+</button>
+                          <button onClick={() => addToCartAndTriggerUpsell(item)} style={{ padding: "6px 12px", background: "transparent", border: "none", borderLeft: "2px solid #000", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>+</button>
                         </div>
                       ) : (
-                        <button onClick={() => addToCartAndCheckAddons(item)} className="btn btn-outline" style={{ padding: "8px 16px" }}>
+                        <button onClick={() => addToCartAndTriggerUpsell(item)} className="btn btn-outline" style={{ padding: "8px 16px" }}>
                           ADD
                         </button>
                     )}
@@ -438,39 +452,76 @@ export default function Home() {
         )}
       </main>
 
-      {/* Addon Modal Suggestion Panel */}
-      {showAddonsFor && (
-        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center" }}>
-           <div className="glass-panel" style={{ background: "var(--color-surface)", padding: "32px", width: "100%", maxWidth: "500px", margin: "24px" }}>
-              <h2 className="heading-ld" style={{ marginBottom: "16px", fontSize: "1.8rem" }}>Add an extra?</h2>
-              <p className="text-muted" style={{ marginBottom: "24px" }}>Would you like to add any extras from <strong>{showAddonsFor?.vendor?.name}</strong> to go with your <strong>{showAddonsFor?.name}</strong>?</p>
+      {/* Addon / Recommendation Side Drawer */}
+      {upsellItem && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", justifyContent: "flex-end" }}>
+           <div className="glass-panel slide-in-right" style={{ background: "var(--color-surface)", padding: "32px", width: "100%", maxWidth: "450px", height: "100vh", overflowY: "auto", borderRadius: "0px", borderLeft: "var(--hard-border)", boxShadow: "-4px 0px 0 #000", display: "flex", flexDirection: "column" }}>
+              <h2 className="heading-ld" style={{ marginBottom: "16px", fontSize: "1.8rem", color: "var(--color-success)" }}>Added to Cart! 🎉</h2>
+              <p className="text-muted" style={{ marginBottom: "24px", lineHeight: "1.4" }}>Would you like to add anything else from <strong>{upsellItem.vendor.name}</strong> to go with your <strong>{upsellItem.name}</strong>?</p>
               
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "32px", maxHeight: "300px", overflowY: "auto" }}>
-                {menu.filter(m => m.category === "Addon" && m.vendor.name === showAddonsFor?.vendor?.name && m.isAvailable).map(addon => {
-                  const inCart = cart.find(i => i.id === addon.id);
-                  return (
-                    <div key={addon.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px", border: "var(--hard-border)", background: "var(--color-surface-light)" }}>
-                      <div>
-                        <span style={{ fontWeight: 700, display: "block" }}>{addon.name}</span>
-                        <span style={{ fontSize: "0.9rem", color: "var(--color-secondary)", fontWeight: 800 }}>+₹{addon.price}</span>
-                      </div>
-                      {inCart ? (
-                          <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px" }}>
-                            <button onClick={() => removeFromCart(addon.id)} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>-</button>
-                            <span style={{ fontWeight: 800, padding: "0 8px", fontSize: "0.9rem" }}>{inCart.quantity}</span>
-                            <button onClick={() => addToCartAndCheckAddons(addon)} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>+</button>
+              {/* Addons Section */}
+              {menu.filter(m => m.category === "Addon" && m.vendor.name === upsellItem.vendor.name && m.isAvailable).length > 0 && (
+                <div style={{ marginBottom: "32px" }}>
+                  <h3 className="heading-md" style={{ marginBottom: "16px", color: "var(--color-secondary)" }}>Options & Extras</h3>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                    {menu.filter(m => m.category === "Addon" && m.vendor.name === upsellItem.vendor.name && m.isAvailable).map(addon => {
+                      const inCart = cart.find(i => i.id === addon.id);
+                      return (
+                        <div key={addon.id} className={animatingItemId === addon.id ? 'animate-pop' : ''} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px", border: "var(--hard-border)", background: "var(--color-surface-light)" }}>
+                          <div>
+                            <span style={{ fontWeight: 700, display: "block" }}>{addon.name}</span>
+                            <span style={{ fontSize: "0.9rem", color: "var(--color-secondary)", fontWeight: 800 }}>+₹{addon.price}</span>
                           </div>
-                      ) : (
-                        <button onClick={() => addToCartAndCheckAddons(addon)} className="btn btn-outline" style={{ padding: "6px 12px", minWidth: "80px" }}>ADD</button>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
+                          {inCart ? (
+                              <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px" }}>
+                                <button onClick={() => removeFromCart(addon.id)} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>-</button>
+                                <span style={{ fontWeight: 800, padding: "0 8px", fontSize: "0.9rem" }}>{inCart.quantity}</span>
+                                <button onClick={() => addToCartAndTriggerUpsell(addon)} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>+</button>
+                              </div>
+                          ) : (
+                            <button onClick={() => addToCartAndTriggerUpsell(addon)} className="btn btn-outline" style={{ padding: "6px 12px", minWidth: "80px" }}>ADD</button>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
 
-              <button onClick={() => setShowAddonsFor(null)} className="btn btn-primary" style={{ width: "100%" }}>
-                DONE
-              </button>
+              {/* Recommendations Section */}
+              {menu.filter(m => m.category === "Main" && m.vendor.name === upsellItem.vendor.name && m.isAvailable && m.id !== upsellItem.id).length > 0 && (
+                <div style={{ marginBottom: "32px" }}>
+                  <h3 className="heading-md" style={{ marginBottom: "16px", color: "var(--color-accent)" }}>You Might Also Like</h3>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                    {menu.filter(m => m.category === "Main" && m.vendor.name === upsellItem.vendor.name && m.isAvailable && m.id !== upsellItem.id).slice(0, 3).map(rec => {
+                      const inCart = cart.find(i => i.id === rec.id);
+                      return (
+                        <div key={rec.id} className={animatingItemId === rec.id ? 'animate-pop' : ''} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px", border: "var(--hard-border)", background: "var(--color-surface-light)" }}>
+                          <div>
+                            <span style={{ fontWeight: 700, display: "block", textTransform: "capitalize" }}>{rec.name}</span>
+                            <span style={{ fontSize: "0.9rem", color: "var(--color-secondary)", fontWeight: 800 }}>₹{rec.price}</span>
+                          </div>
+                          {inCart ? (
+                              <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px" }}>
+                                <button onClick={() => removeFromCart(rec.id)} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>-</button>
+                                <span style={{ fontWeight: 800, padding: "0 8px", fontSize: "0.9rem" }}>{inCart.quantity}</span>
+                                <button onClick={() => addToCartAndTriggerUpsell(rec)} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>+</button>
+                              </div>
+                          ) : (
+                            <button onClick={() => addToCartAndTriggerUpsell(rec)} className="btn btn-outline" style={{ padding: "6px 12px", minWidth: "80px" }}>ADD</button>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div style={{ marginTop: "auto", paddingTop: "24px" }}>
+                <button onClick={() => setUpsellItem(null)} className="btn btn-primary" style={{ width: "100%" }}>
+                  BACK TO MENU
+                </button>
+              </div>
            </div>
         </div>
       )}
