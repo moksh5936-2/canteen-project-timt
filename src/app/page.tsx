@@ -143,7 +143,10 @@ export default function Home() {
         
         <div className="glass-panel" style={{ padding: "48px", maxWidth: "800px", margin: "0 auto" }}>
           <h1 className="heading-xl text-gradient" style={{ marginBottom: "16px", fontSize: "3rem" }}>TIMT Canteen</h1>
-          <p className="text-muted" style={{ fontSize: "1.2rem", marginBottom: "32px" }}>Built with ♥ by <strong>Moksh</strong></p>
+          <p className="text-muted" style={{ fontSize: "1.2rem", marginBottom: "32px", lineHeight: "1.6" }}>
+            Built with ♥ by <strong>MOKSH GUPTA</strong><br/>
+            Contact No: <strong>9034432401</strong>
+          </p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
             <section>
