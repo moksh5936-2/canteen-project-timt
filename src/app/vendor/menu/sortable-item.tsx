@@ -77,8 +77,8 @@ export function SortableItem({ item, onToggle, onDelete }: SortableItemProps) {
 
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <label style={{ display: "flex", alignItems: "center", cursor: "pointer", gap: "8px" }}>
-            <span style={{ fontSize: "0.85rem", color: "var(--color-text-muted)" }}>
-              {item.isAvailable ? "Available" : "Hidden"}
+            <span style={{ fontSize: "0.85rem", color: item.isAvailable ? "var(--color-primary)" : "var(--color-danger)", fontWeight: "bold" }}>
+              {item.isAvailable ? "In Stock" : "Out of Stock"}
             </span>
             <input 
               type="checkbox" 
