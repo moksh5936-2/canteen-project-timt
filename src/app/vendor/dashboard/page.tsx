@@ -104,43 +104,60 @@ export default function DashboardPage() {
           ) : (
             <div className="vendor-dashboard-grid">
               {activeOrders.map(order => (
-                <div key={order.id} className="glass-panel animate-float" style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "16px", borderTop: `8px solid ${getStatusColor(order.status)}`, borderRadius: "0px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <div>
-                      <h3 style={{ fontSize: "1.2rem", fontWeight: 700, margin: 0 }}>{order.studentName}</h3>
-                      <p className="text-muted" style={{ fontSize: "0.9rem", margin: 0 }}>Roll: {order.rollNo}</p>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <span style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--color-secondary)" }}>₹{order.totalAmount}</span>
-                      <p style={{ fontSize: "0.8rem", color: getStatusColor(order.status), fontWeight: 700, margin: 0 }}>{order.status}</p>
-                    </div>
-                  </div>
-
-                  <div style={{ background: "var(--color-surface-light)", borderRadius: "0px", border: "var(--hard-border)", padding: "12px", boxShadow: "4px 4px 0 #000" }}>
-                    {order.items.map(item => (
-                      <div key={item.id} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.95rem", marginBottom: "4px" }}>
-                        <span><span style={{ color: "var(--color-primary)", fontWeight: 700 }}>{item.quantity}x</span> {item.menuItem.name}</span>
+                <div key={order.id} className="glass-panel animate-float" style={{ padding: 0, display: "flex", flexDirection: "column", borderTop: `8px solid ${getStatusColor(order.status)}`, borderRadius: "0px", overflow: "hidden" }}>
+                  
+                  {/* Top/Left: Order Entry Info */}
+                  <div style={{ padding: "20px", background: "var(--color-surface)", display: "flex", flexDirection: "column", gap: "12px", flexGrow: 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                      <div>
+                        <h3 style={{ fontSize: "1.2rem", fontWeight: 700, margin: 0, textTransform: "uppercase" }}>{order.studentName}</h3>
+                        <p className="text-muted" style={{ fontSize: "0.9rem", margin: 0, fontWeight: 600 }}>ROLL: {order.rollNo}</p>
                       </div>
-                    ))}
+                      <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+                        <span style={{ fontSize: "1.4rem", fontWeight: 800, color: "var(--color-secondary)", lineHeight: 1 }}>₹{order.totalAmount}</span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "4px", background: getStatusColor(order.status), color: "white", padding: "4px 8px", fontSize: "0.75rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                           {order.status}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-muted" style={{ fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "4px" }}>
+                       <Clock size={14} /> 
+                       {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
                   </div>
 
-                  <div style={{ marginTop: "auto", display: "flex", gap: "8px" }}>
+                  {/* Bottom/Right: Distinct Items List Container */}
+                  <div style={{ background: "var(--color-bg)", padding: "16px 20px", borderTop: "2px solid #000" }}>
+                     <h4 className="heading-md" style={{ fontSize: "0.9rem", marginBottom: "12px", color: "var(--color-text-muted)" }}>ORDER ITEMS</h4>
+                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                      {order.items.map(item => (
+                        <div key={item.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", fontSize: "0.95rem", background: "var(--color-surface-light)", padding: "8px 12px", border: "1px dashed #000" }}>
+                          <span style={{ fontWeight: 600 }}>{item.menuItem.name}</span>
+                          <span style={{ color: "var(--color-primary)", fontWeight: 800, background: "var(--color-surface)", border: "1px solid #000", padding: "2px 6px", fontSize: "0.85rem" }}>x{item.quantity}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div style={{ display: "flex", borderTop: "2px solid #000" }}>
                     {order.status === "PENDING" && (
-                      <button onClick={() => updateOrderStatus(order.id, "ACCEPTED")} className="btn btn-secondary" style={{ flexGrow: 1, padding: "12px", borderRadius: "0px" }}>
-                        Accept <CheckCircle size={16} />
+                      <button onClick={() => updateOrderStatus(order.id, "ACCEPTED")} className="btn btn-secondary" style={{ flexGrow: 1, padding: "16px", borderRadius: "0px", border: "none", display: "flex", justifyContent: "center" }}>
+                        ACCEPT <CheckCircle size={18} />
                       </button>
                     )}
                     {(order.status === "ACCEPTED" || order.status === "PREPARING") && (
-                      <button onClick={() => updateOrderStatus(order.id, "READY")} className="btn btn-outline" style={{ flexGrow: 1, padding: "12px", borderColor: "var(--color-accent)", color: "var(--color-accent)", borderRadius: "0px" }}>
-                        Mark Ready <Clock size={16} />
+                      <button onClick={() => updateOrderStatus(order.id, "READY")} className="btn btn-outline" style={{ flexGrow: 1, padding: "16px", background: "var(--color-accent)", color: "var(--color-text)", borderRadius: "0px", border: "none", display: "flex", justifyContent: "center" }}>
+                        MARK READY <Clock size={18} />
                       </button>
                     )}
                     {order.status === "READY" && (
-                      <button onClick={() => updateOrderStatus(order.id, "COMPLETED")} className="btn btn-primary" style={{ flexGrow: 1, padding: "12px", background: "var(--color-success)", color: "var(--color-text)", borderRadius: "0px" }}>
-                        Complete <CheckCircle2 size={16} />
+                      <button onClick={() => updateOrderStatus(order.id, "COMPLETED")} className="btn btn-primary" style={{ flexGrow: 1, padding: "16px", background: "var(--color-success)", color: "var(--color-text)", borderRadius: "0px", border: "none", display: "flex", justifyContent: "center" }}>
+                        COMPLETE <CheckCircle2 size={18} />
                       </button>
                     )}
                   </div>
+
                 </div>
               ))}
             </div>

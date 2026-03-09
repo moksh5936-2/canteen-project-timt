@@ -24,6 +24,7 @@ model MenuItem {
   description String?
   price       Float
   image       String?
+  category    String   @default("Main")
   isAvailable Boolean  @default(true)
   orderIndex  Int      @default(0)
   vendorId    String

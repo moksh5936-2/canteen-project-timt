@@ -9,6 +9,7 @@ type MenuItem = {
   description: string;
   price: number;
   image: string | null;
+  category: string;
   vendor: { name: string };
 };
 
@@ -24,6 +25,9 @@ export default function Home() {
   const [name, setName] = useState("");
   const [rollNo, setRollNo] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Addon selection flow
+  const [showAddonsFor, setShowAddonsFor] = useState<MenuItem | null>(null);
 
   // Tracking
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -61,6 +65,16 @@ export default function Home() {
     }
     return () => clearInterval(interval);
   }, [view, orderId, orderStatus]);
+
+  const addToCartAndCheckAddons = (item: MenuItem) => {
+    addToCart(item);
+    if (item.category === "Main") {
+       const hasAddons = menu.some(m => m.category === "Addon" && m.vendor.name === item.vendor.name);
+       if (hasAddons) {
+         setShowAddonsFor(item);
+       }
+    }
+  };
 
   const addToCart = (item: MenuItem) => {
     setCart(prev => {
@@ -324,7 +338,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="menu-grid">
-            {menu.map(item => {
+            {menu.filter(m => m.category === "Main").map(item => {
               const inCart = cart.find(i => i.id === item.id);
               return (
                 <div key={item.id} className="glass-panel" style={{ display: "flex", flexDirection: "column", height: "100%", position: "relative", overflow: "hidden", background: "var(--color-surface-light)", padding: "0" }}>
@@ -353,10 +367,10 @@ export default function Home() {
                         <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px", border: "var(--hard-border)", boxShadow: "4px 4px 0 #000" }}>
                           <button onClick={() => removeFromCart(item.id)} style={{ padding: "10px 16px", background: "transparent", border: "none", borderRight: "var(--hard-border)", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>-</button>
                           <span style={{ fontWeight: 800, padding: "0 16px", fontSize: "1.1rem" }}>{inCart.quantity}</span>
-                          <button onClick={() => addToCart(item)} style={{ padding: "10px 16px", background: "transparent", border: "none", borderLeft: "var(--hard-border)", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>+</button>
+                          <button onClick={() => addToCartAndCheckAddons(item)} style={{ padding: "10px 16px", background: "transparent", border: "none", borderLeft: "var(--hard-border)", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>+</button>
                         </div>
                       ) : (
-                        <button onClick={() => addToCart(item)} style={{ background: "var(--color-primary)", color: "white", border: "var(--hard-border)", boxShadow: "4px 4px 0 #000", padding: "12px 24px", borderRadius: "0px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", textTransform: "uppercase", transition: "all 0.1s" }} onMouseOver={e => { e.currentTarget.style.transform = "translate(-2px,-2px)"; e.currentTarget.style.boxShadow = "6px 6px 0 #000"; }} onMouseOut={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "4px 4px 0 #000"; }}>
+                        <button onClick={() => addToCartAndCheckAddons(item)} style={{ background: "var(--color-primary)", color: "white", border: "var(--hard-border)", boxShadow: "4px 4px 0 #000", padding: "12px 24px", borderRadius: "0px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", textTransform: "uppercase", transition: "all 0.1s" }} onMouseOver={e => { e.currentTarget.style.transform = "translate(-2px,-2px)"; e.currentTarget.style.boxShadow = "6px 6px 0 #000"; }} onMouseOut={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "4px 4px 0 #000"; }}>
                           ADD +
                         </button>
                       )}
@@ -368,7 +382,79 @@ export default function Home() {
             })}
           </div>
         )}
+
+        {/* Categories Separation (Addons listed explicitly at the bottom) */}
+        {menu.some(m => m.category === "Addon") && (
+          <div style={{ marginTop: "60px" }}>
+             <div style={{ display: "flex", alignItems: "center", gap: "24px", marginBottom: "40px" }}>
+              <h2 className="heading-lg" style={{ margin: 0 }}>Addons & Extras</h2>
+              <div style={{ flex: 1, height: "2px", background: "var(--color-text-muted)", opacity: 0.3 }}></div>
+            </div>
+            <div className="menu-grid">
+              {menu.filter(m => m.category === "Addon").map(item => {
+                const inCart = cart.find(i => i.id === item.id);
+                return (
+                  <div key={item.id} className="glass-panel" style={{ padding: "20px", background: "var(--color-surface)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <h4 style={{ fontSize: "1.1rem", fontWeight: 800, margin: 0 }}>{item.name}</h4>
+                      <span style={{ color: "var(--color-text-muted)", fontSize: "0.9rem" }}>{item.vendor.name} • ₹{item.price}</span>
+                    </div>
+                    {inCart ? (
+                        <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px", border: "2px solid #000" }}>
+                          <button onClick={() => removeFromCart(item.id)} style={{ padding: "6px 12px", background: "transparent", border: "none", borderRight: "2px solid #000", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>-</button>
+                          <span style={{ fontWeight: 800, padding: "0 12px", fontSize: "1rem" }}>{inCart.quantity}</span>
+                          <button onClick={() => addToCartAndCheckAddons(item)} style={{ padding: "6px 12px", background: "transparent", border: "none", borderLeft: "2px solid #000", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}>+</button>
+                        </div>
+                      ) : (
+                        <button onClick={() => addToCartAndCheckAddons(item)} className="btn btn-outline" style={{ padding: "8px 16px" }}>
+                          ADD
+                        </button>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </main>
+
+      {/* Addon Modal Suggestion Panel */}
+      {showAddonsFor && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center" }}>
+           <div className="glass-panel" style={{ background: "var(--color-surface)", padding: "32px", width: "100%", maxWidth: "500px", margin: "24px" }}>
+              <h2 className="heading-ld" style={{ marginBottom: "16px", fontSize: "1.8rem" }}>Add an extra?</h2>
+              <p className="text-muted" style={{ marginBottom: "24px" }}>Would you like to add any extras from <strong>{showAddonsFor?.vendor?.name}</strong> to go with your <strong>{showAddonsFor?.name}</strong>?</p>
+              
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "32px", maxHeight: "300px", overflowY: "auto" }}>
+                {menu.filter(m => m.category === "Addon" && m.vendor.name === showAddonsFor?.vendor?.name).map(addon => {
+                  const inCart = cart.find(i => i.id === addon.id);
+                  return (
+                    <div key={addon.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px", border: "var(--hard-border)", background: "var(--color-surface-light)" }}>
+                      <div>
+                        <span style={{ fontWeight: 700, display: "block" }}>{addon.name}</span>
+                        <span style={{ fontSize: "0.9rem", color: "var(--color-secondary)", fontWeight: 800 }}>+₹{addon.price}</span>
+                      </div>
+                      {inCart ? (
+                          <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px" }}>
+                            <button onClick={() => removeFromCart(addon.id)} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>-</button>
+                            <span style={{ fontWeight: 800, padding: "0 8px", fontSize: "0.9rem" }}>{inCart.quantity}</span>
+                            <button onClick={() => addToCartAndCheckAddons(addon)} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>+</button>
+                          </div>
+                      ) : (
+                        <button onClick={() => addToCartAndCheckAddons(addon)} className="btn btn-outline" style={{ padding: "6px 12px", minWidth: "80px" }}>ADD</button>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+
+              <button onClick={() => setShowAddonsFor(null)} className="btn btn-primary" style={{ width: "100%" }}>
+                DONE
+              </button>
+           </div>
+        </div>
+      )}
+
     </div>
   );
 }

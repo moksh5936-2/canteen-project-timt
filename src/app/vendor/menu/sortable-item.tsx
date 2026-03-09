@@ -11,6 +11,7 @@ type SortableItemProps = {
     price: number;
     description: string | null;
     isAvailable: boolean;
+    category: string;
   };
   onToggle: () => void;
   onDelete: () => void;
@@ -58,7 +59,12 @@ export function SortableItem({ item, onToggle, onDelete }: SortableItemProps) {
         
         <div style={{ flexGrow: 1, opacity: item.isAvailable ? 1 : 0.5 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3 style={{ fontSize: "1.1rem", fontWeight: 600, margin: 0 }}>{item.name}</h3>
+            <h3 style={{ fontSize: "1.1rem", fontWeight: 600, margin: 0 }}>
+              {item.name} 
+              <span style={{ fontSize: "0.7rem", marginLeft: "8px", verticalAlign: "middle", background: item.category === "Addon" ? "var(--color-primary)" : "var(--color-accent)", color: item.category === "Addon" ? "white" : "black", padding: "2px 6px", borderRadius: "4px" }}>
+                {item.category.toUpperCase()}
+              </span>
+            </h3>
             <span style={{ display: "flex", alignItems: "center", color: "var(--color-secondary)", fontWeight: 700 }}>
               <IndianRupee size={14} style={{ marginRight: "2px" }} />
               {item.price.toFixed(2)}

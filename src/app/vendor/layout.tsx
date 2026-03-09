@@ -25,13 +25,13 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
   return (
     <div className="vendor-layout" style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--color-bg)" }}>
       {/* Sidebar */}
-      <aside className="vendor-sidebar glass-panel" style={{ width: "260px", padding: "24px", display: "flex", flexDirection: "column", borderTopLeftRadius: "0px", borderBottomLeftRadius: "0px", borderRight: "var(--hard-border)", zIndex: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "40px" }}>
+      <aside className="vendor-sidebar glass-panel" style={{ width: "260px", padding: "24px", display: "flex", flexDirection: "column", borderTopLeftRadius: "0px", borderBottomLeftRadius: "0px", borderRight: "var(--hard-border)", zIndex: 100 }}>
+        <div className="sidebar-header" style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "40px" }}>
           <Utensils color="var(--color-primary)" size={28} />
           <h2 className="heading-md" style={{ margin: 0 }}>Canteen Cartel</h2>
         </div>
 
-        <nav style={{ display: "flex", flexDirection: "column", gap: "12px", flexGrow: 1 }}>
+        <nav className="vendor-nav" style={{ display: "flex", flexDirection: "column", gap: "12px", flexGrow: 1 }}>
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;
@@ -61,14 +61,16 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
           })}
         </nav>
 
-        <button 
-          onClick={handleLogout}
-          className="btn btn-outline" 
-          style={{ width: "100%", justifyContent: "flex-start", padding: "12px 16px", border: "none" }}
-        >
-          <LogOut size={20} style={{ marginRight: "12px" }} />
-          Logout
-        </button>
+        <div className="logout-container">
+          <button 
+            onClick={handleLogout}
+            className="btn btn-outline logout-btn" 
+            style={{ width: "100%", justifyContent: "flex-start", padding: "12px 16px", border: "none" }}
+          >
+            <LogOut size={20} style={{ marginRight: "12px" }} />
+            <span>Logout</span>
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}

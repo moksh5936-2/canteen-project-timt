@@ -262,14 +262,58 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
   }
   
-  /* Vendor Dashboard Flexbox -> Column fixes */
+  /* Vendor Sidebar Fixed Bottom Nav fixes */
   .vendor-layout {
     flex-direction: column !important;
+    padding-bottom: 70px;
   }
   .vendor-sidebar {
     width: 100% !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    flex-direction: row !important;
+    padding: 12px !important;
     border-right: none !important;
-    border-bottom: var(--hard-border);
+    border-top: var(--hard-border);
+    border-bottom: none !important;
+    justify-content: space-around;
+    background: var(--color-surface);
+  }
+  .sidebar-header {
+    display: none !important;
+  }
+  .vendor-nav {
+    flex-direction: row !important;
+    margin-bottom: 0 !important;
+    gap: 8px !important;
+    flex-grow: 1;
+    justify-content: center;
+  }
+  .vendor-nav a {
+    padding: 10px !important;
+    font-size: 0 !important; /* Hide text, show icon */
+    justify-content: center;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .vendor-nav a svg {
+    margin: 0 !important;
+  }
+  .logout-container {
+    display: flex;
+    align-items: center;
+  }
+  .logout-btn {
+    padding: 10px !important;
+    width: auto !important;
+  }
+  .logout-btn span {
+    display: none;
+  }
+  .logout-btn svg {
+    margin: 0 !important;
   }
   
   /* Specific component tweaks */

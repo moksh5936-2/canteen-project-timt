@@ -26,6 +26,7 @@ type MenuItem = {
   price: number;
   image: string | null;
   isAvailable: boolean;
+  category: string;
   orderIndex: number;
 };
 
@@ -38,6 +39,7 @@ export default function MenuEditorPage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
+  const [category, setCategory] = useState("Main");
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -93,7 +95,7 @@ export default function MenuEditorPage() {
     const res = await fetch("/api/vendor/menu", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, description, price, image }),
+      body: JSON.stringify({ name, description, price, image, category }),
     });
 
     if (res.ok) {
@@ -101,6 +103,7 @@ export default function MenuEditorPage() {
       setDescription("");
       setPrice("");
       setImage("");
+      setCategory("Main");
       fetchItems();
     }
   };
@@ -202,6 +205,19 @@ export default function MenuEditorPage() {
                 style={{ resize: "vertical", minHeight: "80px" }}
                 placeholder="Tasty wrap with secret sauce..."
               />
+            </div>
+
+            <div>
+              <label className="text-muted" style={{ display: "block", marginBottom: "8px", fontSize: "0.9rem" }}>Category</label>
+              <select 
+                className="input-field" 
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                style={{ appearance: "auto" }}
+              >
+                <option value="Main">Main Item</option>
+                <option value="Addon">Addon / Extra</option>
+              </select>
             </div>
 
             <div>

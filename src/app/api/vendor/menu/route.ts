@@ -39,6 +39,7 @@ export async function POST(request: Request) {
         description: data.description,
         price: parseFloat(data.price),
         image: data.image || null,
+        category: data.category || "Main",
         vendorId,
         orderIndex: nextIndex,
       }
