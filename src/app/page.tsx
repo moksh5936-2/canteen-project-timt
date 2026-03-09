@@ -301,7 +301,7 @@ export default function Home() {
           <div style={{ background: "var(--color-primary)", padding: "12px", borderRadius: "0px", border: "var(--hard-border)", boxShadow: "var(--hard-shadow)" }}>
              <UtensilsCrossed color="white" size={24} />
           </div>
-          <h1 className="heading-ld" style={{ margin: 0, letterSpacing: "-0.05em", fontSize: "1.75rem" }}>Canteen Cartel</h1>
+          <h1 className="heading-ld" style={{ margin: 0, letterSpacing: "-0.05em", fontSize: "1.75rem" }}>TIMT Canteen</h1>
         </div>
 
         <div className="header-actions" style={{ display: "flex", gap: "16px", alignItems: "center" }}>

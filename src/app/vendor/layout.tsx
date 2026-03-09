@@ -28,7 +28,7 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
       <aside className="vendor-sidebar glass-panel" style={{ width: "260px", padding: "24px", display: "flex", flexDirection: "column", borderTopLeftRadius: "0px", borderBottomLeftRadius: "0px", borderRight: "var(--hard-border)", zIndex: 100 }}>
         <div className="sidebar-header" style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "40px" }}>
           <Utensils color="var(--color-primary)" size={28} />
-          <h2 className="heading-md" style={{ margin: 0 }}>Canteen Cartel</h2>
+          <h2 className="heading-md" style={{ margin: 0 }}>TIMT Canteen</h2>
         </div>
 
         <nav className="vendor-nav" style={{ display: "flex", flexDirection: "column", gap: "12px", flexGrow: 1 }}>
