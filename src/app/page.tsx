@@ -145,15 +145,16 @@ export default function Home() {
         <div className="glass-panel" style={{ padding: "48px", maxWidth: "800px", margin: "0 auto" }}>
           <h1 className="heading-xl text-gradient" style={{ marginBottom: "16px", fontSize: "3rem" }}>TIMT Canteen</h1>
           <p className="text-muted" style={{ fontSize: "1.2rem", marginBottom: "32px", lineHeight: "1.6" }}>
-            Built with ♥ by <strong>MOKSH GUPTA</strong><br/>
-            Contact No: <strong>9034432401</strong>
+            Built with ♥ by <strong>mOkSh GuPtA</strong><br/>
+            Contact No: <strong>9034432401</strong><br/>
+            Title: <strong>Code Architect - Member Tech Warriors</strong>
           </p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
             <section>
-              <h2 className="heading-md" style={{ color: "var(--color-secondary)", marginBottom: "12px" }}>Project Overview</h2>
+              <h2 className="heading-md" style={{ color: "var(--color-secondary)", marginBottom: "12px" }}>Scope of the Project</h2>
               <p style={{ lineHeight: 1.8, fontSize: "1.05rem" }}>
-                Welcome to the official TIMT College Canteen Web Application. This project replaces the manual ordering framework with a fully digitized, real-time platform. It ensures a seamless flow for students connecting directly to the canteen vendors. 
+                The core scope of this project is to modernize and digitize the manual ordering framework of the college canteen. It provides a real-time platform ensuring a seamless, queue-free ordering experience for students, directly connecting them to the canteen vendors with live status tracking and dynamic inventory management.
               </p>
             </section>
 
@@ -291,7 +292,7 @@ export default function Home() {
 
         <div className="header-actions" style={{ display: "flex", gap: "16px", alignItems: "center" }}>
           <button onClick={() => setView("DOCS" as any)} className="btn btn-outline" style={{ display: "flex", gap: "8px", fontWeight: "800" }}>
-            <PartyPopper size={18} /> TIMT INFO
+            <PartyPopper size={18} /> ABOUT
           </button>
           
           <a href="/vendor/login" className="btn btn-secondary" style={{ display: "flex", gap: "8px", fontWeight: "800" }}>
