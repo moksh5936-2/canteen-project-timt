@@ -268,13 +268,22 @@ export default function Home() {
         <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
           <h1 className="heading-xl text-gradient" style={{ margin: 0 }}>Canteen</h1>
           
-          <button 
-            onClick={() => setView("DOCS" as any)} 
-            className="btn btn-outline animate-float"
-            style={{ padding: "8px 16px", borderRadius: "100px", fontSize: "0.85rem", borderColor: "rgba(255, 255, 255, 0.2)" }}
-          >
-            ℹ️ TIMT Info
-          </button>
+          <div style={{ display: "flex", gap: "12px" }}>
+            <button 
+              onClick={() => setView("DOCS" as any)} 
+              className="btn btn-outline animate-float"
+              style={{ padding: "8px 16px", borderRadius: "100px", fontSize: "0.85rem", borderColor: "rgba(255, 255, 255, 0.2)" }}
+            >
+              ℹ️ TIMT Info
+            </button>
+            <a 
+              href="/vendor/login"
+              className="btn btn-outline"
+              style={{ padding: "8px 16px", borderRadius: "100px", fontSize: "0.85rem", borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
+            >
+              👨‍🍳 Vendor Login
+            </a>
+          </div>
         </div>
 
         {cartItemCount > 0 && (
