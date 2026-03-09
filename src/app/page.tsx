@@ -122,6 +122,49 @@ export default function Home() {
 
   // --- RENDERING VIEWS ---
 
+  if (view === ("DOCS" as any)) {
+    return (
+      <div className="container" style={{ padding: "40px 24px" }}>
+        <button onClick={() => setView("MENU")} className="btn btn-outline" style={{ marginBottom: "32px" }}>← Back to Menu</button>
+        
+        <div className="glass-panel" style={{ padding: "48px", maxWidth: "800px", margin: "0 auto" }}>
+          <h1 className="heading-xl text-gradient" style={{ marginBottom: "16px", fontSize: "3rem" }}>TIMT Canteen</h1>
+          <p className="text-muted" style={{ fontSize: "1.2rem", marginBottom: "32px" }}>Built with ♥ by <strong>Moksh</strong></p>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+            <section>
+              <h2 className="heading-md" style={{ color: "var(--color-secondary)", marginBottom: "12px" }}>Project Overview</h2>
+              <p style={{ lineHeight: 1.8, fontSize: "1.05rem" }}>
+                Welcome to the official TIMT College Canteen Web Application. This project replaces the manual ordering framework with a fully digitized, real-time platform. It ensures a seamless flow for students connecting directly to the canteen vendors. 
+              </p>
+            </section>
+
+            <section>
+              <h2 className="heading-md" style={{ color: "var(--color-accent)", marginBottom: "12px" }}>Features</h2>
+              <ul style={{ lineHeight: 1.8, fontSize: "1.05rem", paddingLeft: "24px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                <li><strong>Live Tracker:</strong> Students can track queue states (Accepted, Cooking, Ready).</li>
+                <li><strong>Drag & Drop Menu:</strong> Vendors can open standard desktop dashboards to organically edit, re-arrange, and modify their items instantaneously.</li>
+                <li><strong>Funky & Poppy:</strong> Using dynamic styling via Glassmorphism layouts to be visually exceptional.</li>
+              </ul>
+            </section>
+
+             <section>
+              <h2 className="heading-md" style={{ color: "var(--color-primary)", marginBottom: "12px" }}>Technology</h2>
+              <p style={{ lineHeight: 1.8, fontSize: "1.05rem" }}>
+                Developed using <strong>Next.js 16</strong> (Serverless architecture), <strong>PostgreSQL</strong> via Prisma ORM for permanent cloud database scaling, and responsive <strong>Vanilla CSS</strong> gradients.
+              </p>
+            </section>
+          </div>
+          
+          <div style={{ marginTop: "48px", textAlign: "center", borderTop: "var(--glass-border)", paddingTop: "24px" }}>
+            <p className="text-muted">© 2026 TIMT Canteen Project</p>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
   if (view === "TRACKING") {
     const getStatusDetails = () => {
       switch (orderStatus) {
@@ -221,8 +264,19 @@ export default function Home() {
     <div style={{ paddingBottom: "100px" }}>
       {/* Header */}
       <header className="container" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px", paddingTop: "40px", marginBottom: "24px" }}>
-        <h1 className="heading-xl text-gradient" style={{ margin: 0 }}>Canteen</h1>
         
+        <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
+          <h1 className="heading-xl text-gradient" style={{ margin: 0 }}>Canteen</h1>
+          
+          <button 
+            onClick={() => setView("DOCS" as any)} 
+            className="btn btn-outline animate-float"
+            style={{ padding: "8px 16px", borderRadius: "100px", fontSize: "0.85rem", borderColor: "rgba(255, 255, 255, 0.2)" }}
+          >
+            ℹ️ TIMT Info
+          </button>
+        </div>
+
         {cartItemCount > 0 && (
           <button onClick={() => setView("CHECKOUT")} className="glass-panel" style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 24px", cursor: "pointer", border: "1px solid var(--color-primary)", background: "rgba(255, 46, 147, 0.15)", outline: "none" }}>
             <ShoppingCart color="var(--color-text)" size={24} />

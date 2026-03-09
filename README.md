@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TIMT Canteen Web Application
 
-## Getting Started
+**Made by: Moksh**
 
-First, run the development server:
+Welcome to the TIMT Canteen Web App! This is a modern, responsive, and dynamic platform designed to digitize the college canteen experience, empowering both students and the vendor.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features Let's Dive In
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### For Students
+- **Funky & Poppy UI:** A fully custom, dark-themed glassmorphic design that looks appealing on all devices.
+- **Dynamic Menu & Cart:** Quickly browse food items, adjust quantities, and build a cart instantly.
+- **Fast Checkout:** Seamlessly provide your Name and Roll Number.
+- **Live Tracker Display:** Watch your order change states in real-time (e.g. "Order Accepted", "Cooking your meal", "Ready for Pickup!"). 
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### For The Vendor
+- **Protected Dashboard:** Log in natively through `/vendor/login` (Default username: `canteen@timt.ac.in`).
+- **Live Orders System:** Watch incoming orders populate your dashboard dynamically via polling. Change statuses efficiently.
+- **Interactive Menu Editor:** Utilizes `@dnd-kit` for full drag-and-drop capabilities. Effortlessly create, toggle visibility, delete, or rearrange items. Everything Syncs securely.
+- **Future SMS Integration:** Skeleton logic built to plug in Twilio keys seamlessly to ping your phone immediately!
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Technology Stack
+- **Framework:** Next.js 16 (React) Serverless
+- **Database:** PostgreSQL (via Prisma ORM)
+- **Styling:** Custom Next.js pure CSS (`globals.css`)
+- **Drag-And-Drop:** `@dnd-kit` React Native implementation
+- **Icons:** Lucide React
 
-## Learn More
+## Local Development Instructions
+1. Clone the repository.
+2. Install dependencies: `npm install`.
+3. You need a Postgres database. To generate the SQL mappings on your DB, run `npx prisma db push`.
+4. Run locally: `npm run dev` and navigate to `http://localhost:3000`.
 
-To learn more about Next.js, take a look at the following resources:
+*Note: For a simple local test environment without Postgres, change the Prisma schema provider back to "sqlite" and the URL to "file:./dev.db".*
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> Project structure and codebase maintained under MIT License conventions for internal educational purposes by Moksh.
