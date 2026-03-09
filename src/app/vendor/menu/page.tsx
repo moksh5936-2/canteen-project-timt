@@ -186,7 +186,7 @@ export default function MenuEditorPage() {
         </div>
 
         {/* Add Item Form Area */}
-        <div className="glass-panel" style={{ padding: "24px", position: "sticky", top: "24px" }}>
+        <div className="glass-panel" style={{ padding: "24px", position: "sticky", top: "24px", maxHeight: "calc(100vh - 48px)", overflowY: "auto" }}>
           <h2 className="heading-md" style={{ marginBottom: "16px" }}>Add New Item</h2>
           
           <form onSubmit={addItem} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
