@@ -13,6 +13,7 @@ export async function GET() {
 
     return NextResponse.json(items);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch menu" }, { status: 500 });
+    console.error("DEBUG MENU API ERROR:", error);
+    return NextResponse.json({ error: "Failed to fetch menu", details: String(error) }, { status: 500 });
   }
 }
