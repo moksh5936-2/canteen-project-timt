@@ -5,9 +5,10 @@ import { sendOrderNotification } from "@/lib/twilio";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { studentName, rollNo, items, totalAmount } = body;
+    const { studentName, rollNo, phone, role, items, totalAmount } = body;
 
-    if (!studentName || !rollNo || !items || items.length === 0) {
+    // role is "Student" or "Teacher". Only require rollNo if Student
+    if (!studentName || !items || items.length === 0 || (role === "Student" && !rollNo)) {
       return NextResponse.json({ error: "Missing required checkout fields" }, { status: 400 });
     }
 
@@ -32,10 +33,11 @@ export async function POST(request: Request) {
     }
 
     // Create the order
-    const order = await prisma.order.create({
-      data: {
+    const orderData: any = {
         studentName,
-        rollNo,
+        rollNo: role === "Teacher" ? null : rollNo,
+        role: role || "Student",
+        phone: phone || null,
         totalAmount: calculatedTotal,
         status: "PENDING",
         // In reality, this would be UNPAID and turn PAID via Stripe webhook. We mock it here.
@@ -48,7 +50,10 @@ export async function POST(request: Request) {
             menuItem: { connect: { id: item.id } }
           }))
         }
-      },
+    };
+
+    const order = await prisma.order.create({
+      data: orderData,
       include: {
         items: {
           include: { menuItem: { include: { vendor: true } } }
@@ -57,9 +62,10 @@ export async function POST(request: Request) {
     });
 
     // Determine the vendor (simplification: assume all items from same vendor for SMS)
-    const vendorPhone = order.items[0]?.menuItem.vendor.phone;
+    const orderWithItems = order as any;
+    const vendorPhone = orderWithItems.items[0]?.menuItem.vendor.phone;
     if (vendorPhone) {
-      await sendOrderNotification(vendorPhone, order);
+      await sendOrderNotification(vendorPhone, orderWithItems);
     }
 
     return NextResponse.json({ success: true, orderId: order.id });

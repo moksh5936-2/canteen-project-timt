@@ -26,6 +26,8 @@ export default function Home() {
 
   // Checkout form
   const [name, setName] = useState("");
+  const [role, setRole] = useState<"Student" | "Teacher">("Student");
+  const [phone, setPhone] = useState("");
   const [rollNo, setRollNo] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -124,12 +126,14 @@ export default function Home() {
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !rollNo || cart.length === 0) return;
+    if (!name || (role === "Student" && !rollNo) || !phone || cart.length === 0) return;
     setIsSubmitting(true);
 
     const payload = {
       studentName: name,
-      rollNo,
+      role,
+      phone,
+      rollNo: role === "Teacher" ? null : rollNo,
       items: cart.map(i => ({ id: i.id, quantity: i.quantity, price: getItemPrice(i), variant: i.variant })),
       totalAmount
     };
@@ -167,7 +171,7 @@ export default function Home() {
         <div className="glass-panel" style={{ padding: "48px", maxWidth: "800px", margin: "0 auto" }}>
           <h1 className="heading-xl text-gradient" style={{ marginBottom: "16px", fontSize: "3rem" }}>TIMT Canteen</h1>
           <p className="text-muted" style={{ fontSize: "1.2rem", marginBottom: "32px", lineHeight: "1.6" }}>
-            Built with ♥ by <strong>mOkSh GuPtA</strong><br/>
+            Built with ♥ by <strong>Moksh Gupta & Himanshu</strong><br/>
             Contact No: <strong>9034432401</strong><br/>
             Title: <strong>Code Architect - Member Tech Warriors</strong>
           </p>
@@ -256,28 +260,56 @@ export default function Home() {
             <h2 className="heading-lg text-gradient" style={{ marginBottom: "24px" }}>Checkout</h2>
             <form onSubmit={handleCheckout} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
               <div>
+                <label className="text-muted" style={{ display: "block", marginBottom: "8px" }}>Role</label>
+                <select 
+                  className="input-field" 
+                  value={role} 
+                  onChange={e => setRole(e.target.value as "Student" | "Teacher")}
+                  style={{ width: "100%", padding: "12px", background: "var(--color-surface)", color: "var(--color-text)", border: "var(--hard-border)", borderRadius: "0px", outline: "none" }}
+                >
+                  <option value="Student">Student</option>
+                  <option value="Teacher">Teacher</option>
+                </select>
+              </div>
+
+              <div>
                 <label className="text-muted" style={{ display: "block", marginBottom: "8px" }}>Full Name</label>
                 <input required className="input-field" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. John Doe" />
               </div>
+
               <div>
-                <label className="text-muted" style={{ display: "block", marginBottom: "8px" }}>Roll Number</label>
-                <input required className="input-field" value={rollNo} onChange={e => setRollNo(e.target.value)} placeholder="e.g. 21CS001" />
+                <label className="text-muted" style={{ display: "block", marginBottom: "8px" }}>Phone Number</label>
+                <input required type="tel" className="input-field" value={phone} onChange={e => setPhone(e.target.value)} placeholder="e.g. 9876543210" />
               </div>
+
+              {role === "Student" && (
+                <div>
+                  <label className="text-muted" style={{ display: "block", marginBottom: "8px" }}>Roll Number</label>
+                  <input required className="input-field" value={rollNo} onChange={e => setRollNo(e.target.value)} placeholder="e.g. 21CS001" />
+                </div>
+              )}
 
               <div style={{ background: "var(--color-accent)", border: "var(--hard-border)", borderRadius: "0px", padding: "16px", marginTop: "12px" }}>
                 <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--color-text)", fontWeight: "bold" }}>
-                  Payments are simulated internally for this demonstration.
+                  Payments are collected at the counter.
                 </p>
               </div>
 
               <button type="submit" disabled={isSubmitting || cart.length === 0} className="btn btn-primary" style={{ marginTop: "8px", width: "100%", padding: "16px" }}>
-                {isSubmitting ? "Processing..." : `Pay ₹${totalAmount.toFixed(2)}`}
+                {isSubmitting ? "Processing..." : `Pay at Counter ₹${totalAmount.toFixed(2)}`}
               </button>
             </form>
           </div>
 
           <div className="glass-panel" style={{ padding: "32px" }}>
-            <h3 className="heading-md" style={{ marginBottom: "24px" }}>Order Summary</h3>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+              <h3 className="heading-md" style={{ margin: 0 }}>Order Summary</h3>
+              {cart.length > 0 && (
+                <button type="button" onClick={() => setCart([])} className="btn btn-outline" style={{ padding: "8px 16px", fontSize: "0.85rem" }}>
+                  EMPTY CART
+                </button>
+              )}
+            </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               {cart.map((item, idx) => (
                 <div key={`${item.id}-${item.variant || 'std'}-${idx}`} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -435,7 +467,7 @@ export default function Home() {
                         </div>
                       ) : (
                         <button onClick={() => addToCartAndTriggerUpsell(item)} style={{ background: "var(--color-primary)", color: "white", border: "var(--hard-border)", boxShadow: "4px 4px 0 #000", padding: "12px 24px", borderRadius: "0px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", textTransform: "uppercase", transition: "all 0.1s" }} onMouseOver={e => { e.currentTarget.style.transform = "translate(-2px,-2px)"; e.currentTarget.style.boxShadow = "6px 6px 0 #000"; }} onMouseOut={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "4px 4px 0 #000"; }}>
-                          ADD +
+                          ADD - ₹{item.price} +
                         </button>
                       )}
                     </div>

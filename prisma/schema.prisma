@@ -40,7 +40,9 @@ model MenuItem {
 model Order {
   id            String      @id @default(cuid())
   studentName   String
-  rollNo        String
+  role          String      @default("Student") // "Student" or "Teacher"
+  rollNo        String?
+  phone         String?
   totalAmount   Float
   status        String      @default("PENDING") // PENDING, ACCEPTED, PREPARING, READY, COMPLETED, CANCELLED
   paymentStatus String      @default("UNPAID") // UNPAID, PAID
