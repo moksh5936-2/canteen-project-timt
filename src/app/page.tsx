@@ -126,7 +126,10 @@ export default function Home() {
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || (role === "Student" && !rollNo) || !phone || cart.length === 0) return;
+    if (!name || (role === "Student" && rollNo.length !== 8) || phone.length !== 10 || cart.length === 0) {
+      alert("Please ensure phone is 10 digits and roll number is exactly 8 characters.");
+      return;
+    }
     setIsSubmitting(true);
 
     const payload = {
@@ -279,13 +282,13 @@ export default function Home() {
 
               <div>
                 <label className="text-muted" style={{ display: "block", marginBottom: "8px" }}>Phone Number</label>
-                <input required type="tel" className="input-field" value={phone} onChange={e => setPhone(e.target.value)} placeholder="e.g. 9876543210" />
+                <input required type="tel" pattern="[0-9]{10}" maxLength={10} minLength={10} title="Please enter exactly 10 digits" className="input-field" value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, ''))} placeholder="e.g. 9876543210" />
               </div>
 
               {role === "Student" && (
                 <div>
                   <label className="text-muted" style={{ display: "block", marginBottom: "8px" }}>Roll Number</label>
-                  <input required className="input-field" value={rollNo} onChange={e => setRollNo(e.target.value)} placeholder="e.g. 21CS001" />
+                  <input required maxLength={8} minLength={8} title="Roll number must be exactly 8 characters" className="input-field" value={rollNo} onChange={e => setRollNo(e.target.value.toUpperCase())} placeholder="e.g. 21CS001A" />
                 </div>
               )}
 
