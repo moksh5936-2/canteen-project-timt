@@ -557,7 +557,31 @@ export default function Home() {
         >
            <div className="glass-panel slide-in-right" style={{ background: "var(--color-surface)", padding: "32px", width: "100%", maxWidth: "450px", height: "100vh", overflowY: "auto", borderRadius: "0px", borderLeft: "var(--hard-border)", boxShadow: "-4px 0px 0 #000", display: "flex", flexDirection: "column" }}>
               <h2 className="heading-ld" style={{ marginBottom: "16px", fontSize: "1.8rem", color: "var(--color-success)" }}>Added to Cart! 🎉</h2>
-              <p className="text-muted" style={{ marginBottom: "24px", lineHeight: "1.4" }}>Would you like to add anything else from <strong>{upsellItem.vendor.name}</strong> to go with your <strong>{upsellItem.name}</strong>?</p>
+
+              {/* Quantity control for the main upsellItem itself */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", background: "var(--color-surface-light)", border: "var(--hard-border)", boxShadow: "3px 3px 0 #000", marginBottom: "24px" }}>
+                <div>
+                  <span style={{ fontWeight: 800, fontSize: "1.05rem", display: "block" }}>{upsellItem.name}</span>
+                  <span style={{ fontSize: "0.9rem", color: "var(--color-secondary)", fontWeight: 700 }}>
+                    ₹{upsellItem.price} each
+                  </span>
+                </div>
+                <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", border: "var(--hard-border)", boxShadow: "2px 2px 0 #000" }}>
+                  <button
+                    onClick={() => removeFromCart(upsellItem.id)}
+                    style={{ padding: "8px 14px", background: "transparent", border: "none", borderRight: "var(--hard-border)", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}
+                  >-</button>
+                  <span style={{ fontWeight: 800, padding: "0 14px", fontSize: "1.05rem", minWidth: "32px", textAlign: "center" }}>
+                    {cart.find(i => i.id === upsellItem.id && !i.variant)?.quantity ?? 0}
+                  </span>
+                  <button
+                    onClick={() => { addToCart(upsellItem); setAnimatingItemId(upsellItem.id); setTimeout(() => setAnimatingItemId(null), 300); }}
+                    style={{ padding: "8px 14px", background: "transparent", border: "none", borderLeft: "var(--hard-border)", color: "white", cursor: "pointer", fontWeight: "800", fontSize: "1.2rem" }}
+                  >+</button>
+                </div>
+              </div>
+
+              <p className="text-muted" style={{ marginBottom: "24px", lineHeight: "1.4" }}>Would you like to add anything else from <strong>{upsellItem.vendor.name}</strong>?</p>
               
               {/* Addons / Extras Section — always visible */}
               {menu.filter(m => m.category === "Addon" && m.vendor.name === upsellItem.vendor.name && m.isAvailable).length > 0 && (
