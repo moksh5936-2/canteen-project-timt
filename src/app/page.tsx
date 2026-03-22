@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Minus, Plus, ShoppingCart, UtensilsCrossed, ArrowRight, CheckCircle, Clock, Truck, PartyPopper } from "lucide-react";
+import { Loader2, ShoppingCart, UtensilsCrossed, ArrowRight, CheckCircle, Clock, Truck, PartyPopper, ChevronDown } from "lucide-react";
 
 type MenuItem = {
   id: string;
@@ -19,7 +19,14 @@ type MenuItem = {
 type CartItem = MenuItem & { quantity: number, variant?: "Half" | "Full" };
 
 export default function Home() {
-  const [view, setView] = useState<"MENU" | "CHECKOUT" | "TRACKING">("MENU");
+  // Restore state from sessionStorage (survives app-switch / page refresh)
+  const [view, setView] = useState<"MENU" | "CHECKOUT" | "TRACKING">(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("cc_view");
+      if (saved === "TRACKING" || saved === "CHECKOUT") return saved;
+    }
+    return "MENU";
+  });
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,10 +41,21 @@ export default function Home() {
   // Upsell Side-Drawer flow
   const [upsellItem, setUpsellItem] = useState<MenuItem | null>(null);
   const [animatingItemId, setAnimatingItemId] = useState<string | null>(null);
+  // "You'd Also Like" section collapsed by default
+  const [youLikeOpen, setYouLikeOpen] = useState(false);
 
   // Tracking
-  const [orderId, setOrderId] = useState<string | null>(null);
-  const [orderStatus, setOrderStatus] = useState("PENDING");
+  const [orderId, setOrderId] = useState<string | null>(() =>
+    typeof window !== "undefined" ? sessionStorage.getItem("cc_orderId") : null
+  );
+  const [orderStatus, setOrderStatus] = useState<string>(() =>
+    typeof window !== "undefined" ? (sessionStorage.getItem("cc_orderStatus") || "PENDING") : "PENDING"
+  );
+
+  // Persist view/orderId/orderStatus to sessionStorage whenever they change
+  useEffect(() => { sessionStorage.setItem("cc_view", view); }, [view]);
+  useEffect(() => { if (orderId) sessionStorage.setItem("cc_orderId", orderId); }, [orderId]);
+  useEffect(() => { sessionStorage.setItem("cc_orderStatus", orderStatus); }, [orderStatus]);
 
   useEffect(() => {
     fetch("/api/menu")
@@ -72,26 +90,29 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [view, orderId, orderStatus]);
 
-  const addToCartAndTriggerUpsell = (item: MenuItem, variant?: "Half" | "Full") => {
-    // Basic Add to Cart
+  const addToCartAndTriggerUpsell = (item: MenuItem, variant?: "Half" | "Full", fromDrawer?: boolean) => {
+    // Check if it's already in cart (incrementing) — if so, no drawer needed
+    const alreadyInCart = cart.some(i => i.id === item.id && i.variant === variant);
+
+    // Add to cart
     addToCart(item, variant);
 
-    // Trigger explicit animation
+    // Trigger pop animation
     setAnimatingItemId(item.id);
     setTimeout(() => setAnimatingItemId(null), 300);
 
-    // Only open the drawer if we are adding a Main item
-    // and there are either Addons OR other available Main items from this vendor
-    if (item.category === "Main") {
-       const hasUpsells = menu.some(m => 
-          m.vendor.name === item.vendor.name && 
-          m.isAvailable && 
-          (m.category === "Addon" || (m.category === "Main" && m.id !== item.id))
-       );
-       
-       if (hasUpsells) {
-         setUpsellItem(item);
-       }
+    // Open drawer only on FIRST add (not when user bumps quantity with +)
+    // If already in drawer (fromDrawer=true), keep it open on the same item
+    if (!alreadyInCart) {
+      const hasUpsells = menu.some(m =>
+        m.vendor.name === item.vendor.name &&
+        m.isAvailable &&
+        (m.category === "Addon" || (m.category === "Main" && m.id !== item.id))
+      );
+      if (hasUpsells) {
+        setYouLikeOpen(false); // always reset collapse on new open
+        setUpsellItem(item);
+      }
     }
   };
 
@@ -150,6 +171,7 @@ export default function Home() {
     if (res.ok) {
       const data = await res.json();
       setOrderId(data.orderId);
+      setOrderStatus("PENDING");
       setCart([]);
       setView("TRACKING");
     }
@@ -244,7 +266,13 @@ export default function Home() {
         </div>
 
         {orderStatus === "COMPLETED" && (
-          <button onClick={() => setView("MENU")} className="btn btn-primary" style={{ marginTop: "32px" }}>
+          <button onClick={() => {
+            // Clear session so a fresh order can start
+            sessionStorage.removeItem("cc_view");
+            sessionStorage.removeItem("cc_orderId");
+            sessionStorage.removeItem("cc_orderStatus");
+            setView("MENU");
+          }} className="btn btn-primary" style={{ marginTop: "32px" }}>
             Order Again
           </button>
         )}
@@ -524,12 +552,14 @@ export default function Home() {
 
       {/* Addon / Recommendation Side Drawer */}
       {upsellItem && (
-        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", justifyContent: "flex-end" }}>
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", justifyContent: "flex-end" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setUpsellItem(null); }}
+        >
            <div className="glass-panel slide-in-right" style={{ background: "var(--color-surface)", padding: "32px", width: "100%", maxWidth: "450px", height: "100vh", overflowY: "auto", borderRadius: "0px", borderLeft: "var(--hard-border)", boxShadow: "-4px 0px 0 #000", display: "flex", flexDirection: "column" }}>
               <h2 className="heading-ld" style={{ marginBottom: "16px", fontSize: "1.8rem", color: "var(--color-success)" }}>Added to Cart! 🎉</h2>
               <p className="text-muted" style={{ marginBottom: "24px", lineHeight: "1.4" }}>Would you like to add anything else from <strong>{upsellItem.vendor.name}</strong> to go with your <strong>{upsellItem.name}</strong>?</p>
               
-              {/* Addons Section */}
+              {/* Addons / Extras Section — always visible */}
               {menu.filter(m => m.category === "Addon" && m.vendor.name === upsellItem.vendor.name && m.isAvailable).length > 0 && (
                 <div style={{ marginBottom: "32px" }}>
                   <h3 className="heading-md" style={{ marginBottom: "16px", color: "var(--color-secondary)" }}>Options & Extras</h3>
@@ -543,13 +573,13 @@ export default function Home() {
                             <span style={{ fontSize: "0.9rem", color: "var(--color-secondary)", fontWeight: 800 }}>+₹{addon.price}</span>
                           </div>
                           {inCart ? (
-                              <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px" }}>
+                              <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px", border: "var(--hard-border)" }}>
                                 <button onClick={() => removeFromCart(addon.id)} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>-</button>
                                 <span style={{ fontWeight: 800, padding: "0 8px", fontSize: "0.9rem" }}>{inCart.quantity}</span>
-                                <button onClick={() => addToCartAndTriggerUpsell(addon)} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>+</button>
+                                <button onClick={() => { addToCart(addon); setAnimatingItemId(addon.id); setTimeout(() => setAnimatingItemId(null), 300); }} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>+</button>
                               </div>
                           ) : (
-                            <button onClick={() => addToCartAndTriggerUpsell(addon)} className="btn btn-outline" style={{ padding: "6px 12px", minWidth: "80px" }}>ADD</button>
+                            <button onClick={() => addToCartAndTriggerUpsell(addon, undefined, true)} className="btn btn-outline" style={{ padding: "6px 12px", minWidth: "80px" }}>ADD</button>
                           )}
                         </div>
                       )
@@ -558,32 +588,73 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Recommendations Section */}
+              {/* "You'd Also Like" — COLLAPSED by default with attention-grabbing arrow */}
               {menu.filter(m => m.category === "Main" && m.vendor.name === upsellItem.vendor.name && m.isAvailable && m.id !== upsellItem.id).length > 0 && (
                 <div style={{ marginBottom: "32px" }}>
-                  <h3 className="heading-md" style={{ marginBottom: "16px", color: "var(--color-accent)" }}>You Might Also Like</h3>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                    {menu.filter(m => m.category === "Main" && m.vendor.name === upsellItem.vendor.name && m.isAvailable && m.id !== upsellItem.id).slice(0, 3).map(rec => {
-                      const inCart = cart.find(i => i.id === rec.id);
-                      return (
-                        <div key={rec.id} className={animatingItemId === rec.id ? 'animate-pop' : ''} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px", border: "var(--hard-border)", background: "var(--color-surface-light)" }}>
-                          <div>
-                            <span style={{ fontWeight: 700, display: "block", textTransform: "capitalize" }}>{rec.name}</span>
-                            <span style={{ fontSize: "0.9rem", color: "var(--color-secondary)", fontWeight: 800 }}>₹{rec.price}</span>
+                  {/* Collapsible Header */}
+                  <button
+                    onClick={() => setYouLikeOpen(o => !o)}
+                    className="animate-peek-wiggle"
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "14px 16px",
+                      background: "var(--color-accent)",
+                      border: "var(--hard-border)",
+                      boxShadow: "4px 4px 0 #000",
+                      cursor: "pointer",
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 800,
+                      fontSize: "1rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                      color: "var(--color-text)",
+                      outline: "none",
+                      borderRadius: "0px",
+                      marginBottom: youLikeOpen ? "12px" : "0",
+                    }}
+                  >
+                    <span>👀 You'd Also Like</span>
+                    <span
+                      className={!youLikeOpen ? "animate-bounce-arrow" : ""}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        transition: "transform 0.3s ease",
+                        transform: youLikeOpen ? "rotate(180deg)" : "rotate(0deg)",
+                      }}
+                    >
+                      <ChevronDown size={22} strokeWidth={3} />
+                    </span>
+                  </button>
+
+                  {/* Collapsible Content */}
+                  {youLikeOpen && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                      {menu.filter(m => m.category === "Main" && m.vendor.name === upsellItem.vendor.name && m.isAvailable && m.id !== upsellItem.id).slice(0, 3).map(rec => {
+                        const inCart = cart.find(i => i.id === rec.id);
+                        return (
+                          <div key={rec.id} className={animatingItemId === rec.id ? 'animate-pop' : ''} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px", border: "var(--hard-border)", background: "var(--color-surface-light)" }}>
+                            <div>
+                              <span style={{ fontWeight: 700, display: "block", textTransform: "capitalize" }}>{rec.name}</span>
+                              <span style={{ fontSize: "0.9rem", color: "var(--color-secondary)", fontWeight: 800 }}>₹{rec.price}</span>
+                            </div>
+                            {inCart ? (
+                                <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px", border: "var(--hard-border)" }}>
+                                  <button onClick={() => removeFromCart(rec.id)} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>-</button>
+                                  <span style={{ fontWeight: 800, padding: "0 8px", fontSize: "0.9rem" }}>{inCart.quantity}</span>
+                                  <button onClick={() => { addToCart(rec); setAnimatingItemId(rec.id); setTimeout(() => setAnimatingItemId(null), 300); }} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>+</button>
+                                </div>
+                            ) : (
+                              <button onClick={() => addToCartAndTriggerUpsell(rec, undefined, true)} className="btn btn-outline" style={{ padding: "6px 12px", minWidth: "80px" }}>ADD</button>
+                            )}
                           </div>
-                          {inCart ? (
-                              <div style={{ display: "inline-flex", alignItems: "center", background: "var(--color-primary)", color: "white", borderRadius: "0px" }}>
-                                <button onClick={() => removeFromCart(rec.id)} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>-</button>
-                                <span style={{ fontWeight: 800, padding: "0 8px", fontSize: "0.9rem" }}>{inCart.quantity}</span>
-                                <button onClick={() => addToCartAndTriggerUpsell(rec)} style={{ padding: "4px 10px", background: "transparent", border: "none", color: "white", cursor: "pointer", fontWeight: "800" }}>+</button>
-                              </div>
-                          ) : (
-                            <button onClick={() => addToCartAndTriggerUpsell(rec)} className="btn btn-outline" style={{ padding: "6px 12px", minWidth: "80px" }}>ADD</button>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 
